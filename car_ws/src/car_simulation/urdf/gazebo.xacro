@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <gazebo>
+        <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+            <!-- ✅ Wheel Information -->
+            <left_joint>left_wheel_joint</left_joint>
+            <right_joint>right_wheel_joint</right_joint>
+            <wheel_separation>0.13</wheel_separation>  <!-- ⚡ 바퀴 간격 조정 -->
+            <wheel_diameter>0.06</wheel_diameter>  <!-- ⚡ 바퀴 크기 조정 -->
+
+            <!-- ✅ Limits -->
+            <max_wheel_torque>200</max_wheel_torque>
+            <max_wheel_acceleration>10.0</max_wheel_acceleration>
+
+            <!-- ✅ Output -->
+            <robot_base_frame>base_link</robot_base_frame>
+            <odometry_frame>odom</odometry_frame>
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            <publish_wheel_tf>true</publish_wheel_tf>
+
+            <!-- ✅ Topic 설정 (cmd_vel 연동 확인) -->
+            <cmd_vel_topic>/cmd_vel</cmd_vel_topic>
+            <odom_topic>/odom</odom_topic>
+        </plugin>
+    </gazebo>
+
+    <!-- ✅ Left Wheel -->
+    <gazebo reference="left_wheel">
+        <material>Gazebo/White</material>
+        <mu1>0.5</mu1>  <!-- ⚡ 마찰력 조정 -->
+        <mu2>0.5</mu2>
+        <kp>1000000</kp>  <!-- ⚡ 충돌 강도 조정 -->
+        <kd>1</kd>
+    </gazebo>
+
+    <!-- ✅ Right Wheel -->
+    <gazebo reference="right_wheel">
+        <material>Gazebo/White</material>
+        <mu1>0.5</mu1>  <!-- ⚡ 마찰력 조정 -->
+        <mu2>0.5</mu2>
+        <kp>1000000</kp>  <!-- ⚡ 충돌 강도 조정 -->
+        <kd>1</kd>
+    </gazebo>
+
+    <!-- ✅ 추가: Caster Wheel 설정 (필요 시) -->
+    <gazebo reference="caster_wheel">
+        <material>Gazebo/Black</material>
+        <mu1>0.5</mu1>
+        <mu2>0.5</mu2>
+        <kp>1000000</kp>
+        <kd>1</kd>
+    </gazebo>
+
+</robot>

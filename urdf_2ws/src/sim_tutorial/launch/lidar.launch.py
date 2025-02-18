@@ -7,20 +7,24 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    # 1. 패키지 정보, 파일 경로 설정
     package_name = "sim_tutorial"
 
+    # 2. 로봇 관련 런치파일 실행
     rsp = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
+            # 로봇 urdf모델 및 센서 설정
             [os.path.join(get_package_share_directory(package_name), "launch", "robot_4.launch.py")]
         ),
+        # 시뮬레이션 시간 사용
         launch_arguments={"use_sim_time": "true"}.items(),
     )
 
-
+    # 3.사용할 gazebo 월드 설정
     world = os.path.join(
         get_package_share_directory(package_name),
-        'worlds',
-        'custom_world.world'
+        'worlds', # worlds.
+        'custom_world.world' # gazebo 환경 사용
     )
 
 
