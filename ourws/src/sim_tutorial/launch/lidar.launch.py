@@ -19,8 +19,8 @@ def generate_launch_description():
 
     world = os.path.join(
         get_package_share_directory(package_name),
-        'world',
-        'with_robot.world'
+        'worlds',
+        'mars.world'
     )
 
 
@@ -37,7 +37,7 @@ def generate_launch_description():
     spawn_entity = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
-        arguments=["-topic", "robot_description", "-entity", "with_robot"],
+        arguments=["-topic", "robot_description", "-entity", "with_robot", "-x", "1", "-y", "1", "-z", "1"],
         output="screen",
     )
 
