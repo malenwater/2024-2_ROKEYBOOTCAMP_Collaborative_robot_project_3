@@ -9,12 +9,12 @@ from launch_ros.actions import Node
 def generate_launch_description():
     package_name = "mars_plan"
 
-    # rsp = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         [os.path.join(get_package_share_directory(package_name), "launch", "prove.launch.py")]
-    #     ),
-    #     launch_arguments={"use_sim_time": "true"}.items(),
-    # )
+    prove_spawn = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [os.path.join(get_package_share_directory(package_name), "launch", "prove.launch.py")]
+        ),
+        launch_arguments={"use_sim_time": "true"}.items(),
+    )
 
 
     world = os.path.join(
@@ -32,20 +32,11 @@ def generate_launch_description():
         launch_arguments={'world': world}.items()
     )
 
-
-    # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
-    spawn_entity = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
-        arguments=["-topic", "robot_description", "-entity", "turtlebot3_waffle", "-x", "1", "-y", "1", "-z", "1"],
-        output="screen",
-    )
-
     # Launch them all!
     return LaunchDescription(
         [
             # rsp,
             gazebo,
-            spawn_entity,
+            prove_spawn,
         ]
     )
