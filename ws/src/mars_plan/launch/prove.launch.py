@@ -9,16 +9,16 @@ import xacro
 def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
     # 패키지 경로
-    pkg_path = get_package_share_directory("turtlebot3_description")
+    pkg_path = os.path.join(get_package_share_directory("mars_plan"))
     # TurtleBot3 Waffle URDF 경로
-    xacro_file = os.path.join(pkg_path, "urdf", "turtlebot3_waffle.xacro")
+    xacro_file = os.path.join(pkg_path, "urdf", "turtlebot3_waffle_pi.urdf")
     # Xacro 파일 처리
     robot_description = xacro.process_file(xacro_file)
     # 파라미터 설정
     params = {
         "robot_description": robot_description.toxml(), 
         "use_sim_time": use_sim_time,
-        "namespace": "robot4"
+        "namespace": "robot12"
     }
 
     # LaunchDescription 반환

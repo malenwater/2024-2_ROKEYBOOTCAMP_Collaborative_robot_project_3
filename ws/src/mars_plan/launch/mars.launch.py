@@ -34,18 +34,18 @@ def generate_launch_description():
 
 
     # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
-    # spawn_entity = Node(
-    #     package="gazebo_ros",
-    #     executable="spawn_entity.py",
-    #     arguments=["-topic", "robot_description", "-entity", "turtlebot3_waffle", "-x", "1", "-y", "1", "-z", "1"],
-    #     output="screen",
-    # )
+    spawn_entity = Node(
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        arguments=["-topic", "robot_description", "-entity", "turtlebot3_waffle", "-x", "1", "-y", "1", "-z", "1"],
+        output="screen",
+    )
 
     # Launch them all!
     return LaunchDescription(
         [
             # rsp,
             gazebo,
-            # spawn_entity,
+            spawn_entity,
         ]
     )
