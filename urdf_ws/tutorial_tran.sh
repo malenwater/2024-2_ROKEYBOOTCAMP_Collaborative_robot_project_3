@@ -1,0 +1,1 @@
+ros2 run tf2_ros static_transform_publisher 2 1 0 0.785 0 0 world robot_1

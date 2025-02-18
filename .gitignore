@@ -1,3 +1,6 @@
 build
 log
 install
+.vscode
+photo
+__pycache__
