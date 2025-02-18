@@ -11,7 +11,7 @@ def generate_launch_description():
     # 패키지 경로
     pkg_path = os.path.join(get_package_share_directory("mars_plan"))
     # TurtleBot3 Waffle URDF 경로
-    xacro_file = os.path.join(pkg_path, "urdf", "turtlebot3_waffle_pi.urdf")
+    xacro_file = os.path.join(pkg_path, "urdf", "turtlebot3_waffle.xacro")
     # Xacro 파일 처리
     robot_description = xacro.process_file(xacro_file)
     # 파라미터 설정
