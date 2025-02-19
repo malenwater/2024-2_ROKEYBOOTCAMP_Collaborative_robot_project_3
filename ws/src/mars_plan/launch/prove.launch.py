@@ -13,64 +13,71 @@ import xacro
 
 def generate_launch_description():
     ld = LaunchDescription()
+
+    # Names and poses of the robots
     robots = [
-        {'name': 'tb1', 'x_pose': '2.0', 'y_pose': '5.0', 'z_pose': '0.01'},
-        {'name': 'tb2', 'x_pose': '2.5', 'y_pose': '5.0', 'z_pose': '0.01'},
+        {'name': 'tb1', 'x_pose': '-1.5', 'y_pose': '-0.5', 'z_pose': "0.01"},
+        {'name': 'tb2', 'x_pose': '-1.5', 'y_pose': '0.5', 'z_pose': "0.01"},
         #{'name': 'tb3', 'x_pose': '1.5', 'y_pose': '-0.5', 'z_pose': 0.01},
         #{'name': 'tb4', 'x_pose': '1.5', 'y_pose': '0.5', 'z_pose': 0.01},
         # ...
         # ...
         ]
-    package_dir = get_package_share_directory('mars_plan')
-    
+
+    TURTLEBOT3_MODEL = 'waffle'
+
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+    declare_use_sim_time = DeclareLaunchArgument(
+        name='use_sim_time', default_value=use_sim_time, description='Use simulator time'
+    )
+
     enable_drive = LaunchConfiguration('enable_drive', default='false')
     declare_enable_drive = DeclareLaunchArgument(
         name='enable_drive', default_value=enable_drive, description='Enable robot drive node'
     )
+
     enable_rviz = LaunchConfiguration('enable_rviz', default='true')
     declare_enable_rviz = DeclareLaunchArgument(
         name='enable_rviz', default_value=enable_rviz, description='Enable rviz launch'
     )
+
+    
+    mars_plan = get_package_share_directory('mars_plan')
+
+    package_dir = get_package_share_directory('mars_plan')
+    nav_launch_dir = os.path.join(package_dir, 'launch', 'nav2_bringup')
+
     rviz_config_file = LaunchConfiguration('rviz_config_file')
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         'rviz_config_file',
         default_value=os.path.join(
             package_dir, 'rviz', 'multi_nav2_default_view.rviz'),
         description='Full path to the RVIZ config file to use')
-    
-    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-    declare_use_sim_time = DeclareLaunchArgument(
-        name='use_sim_time', default_value=use_sim_time, description='Use simulator time'
+
+    urdf = os.path.join(
+        mars_plan, 'urdf', 'turtlebot3_' + TURTLEBOT3_MODEL + '.urdf'
     )
-    
-    # print("hihi")
+
     params_file = LaunchConfiguration('nav_params_file')
     declare_params_file_cmd = DeclareLaunchArgument(
         'nav_params_file',
         default_value=os.path.join(package_dir, 'params', 'nav2_params.yaml'),
         description='Full path to the ROS2 parameters file to use for all launched nodes')
-    # print("hihi")
     
+     
     ld.add_action(declare_use_sim_time)
     ld.add_action(declare_enable_drive)
     ld.add_action(declare_enable_rviz)
     ld.add_action(declare_rviz_config_file_cmd)
     ld.add_action(declare_params_file_cmd)
-    
-    remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
-    turtlebot3_multi_robot = get_package_share_directory('mars_plan')
-    TURTLEBOT3_MODEL = 'waffle'
-    nav_launch_dir = os.path.join(package_dir, 'launch', 'nav2_bringup')
-    urdf = os.path.join(
-        turtlebot3_multi_robot, 'urdf', 'turtlebot3_' + TURTLEBOT3_MODEL + '_pi.urdf'
-    )
-    last_action = None
-    
+ 
+    remappings = [('/tf', 'tf'),
+                  ('/tf_static', 'tf_static')]
     map_server=Node(package='nav2_map_server',
         executable='map_server',
         name='map_server',
         output='screen',
-        parameters=[{'yaml_filename': os.path.join(get_package_share_directory('mars_plan'), 'map', 'map.yaml'),
+        parameters=[{'yaml_filename': os.path.join(get_package_share_directory('turtlebot3_navigation2'), 'map', 'map.yaml'),
                      },],
         remappings=remappings)
 
@@ -82,8 +89,17 @@ def generate_launch_description():
                         {'autostart': True},
                         {'node_names': ['map_server']}])
 
+
     ld.add_action(map_server)
     ld.add_action(map_server_lifecyle)
+
+    ######################
+
+    # Remapping is required for state publisher otherwise /tf and /tf_static 
+    # will get be published on root '/' namespace
+    remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
+
+    last_action = None
     
     # Spawn turtlebot3 instances in gazebo
     for robot in robots:
@@ -107,7 +123,7 @@ def generate_launch_description():
             package='gazebo_ros',
             executable='spawn_entity.py',
             arguments=[
-                '-file', os.path.join(turtlebot3_multi_robot,'models', 'turtlebot3_' + TURTLEBOT3_MODEL +'_pi', 'model.sdf'),
+                '-file', os.path.join(mars_plan,'models', 'turtlebot3_' + TURTLEBOT3_MODEL +'_pi', 'model.sdf'),
                 '-entity', robot['name'],
                 '-robot_namespace', namespace,
                 '-x', robot['x_pose'], '-y', robot['y_pose'],
@@ -116,7 +132,7 @@ def generate_launch_description():
             ],
             output='screen',
         )
-        
+
         bringup_cmd = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     os.path.join(nav_launch_dir, 'bringup_launch.py')),
@@ -157,50 +173,50 @@ def generate_launch_description():
         # Save last instance for next RegisterEventHandler
         last_action = spawn_turtlebot3_burger
         
-    for robot in robots:
+    # for robot in robots:
 
-        namespace = [ '/' + robot['name'] ]
+    #     namespace = [ '/' + robot['name'] ]
 
-        # Create a initial pose topic publish call
-        message = '{header: {frame_id: map}, pose: {pose: {position: {x: ' + \
-            robot['x_pose'] + ', y: ' + robot['y_pose'] + \
-            ', z: 0.1}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0000000}}, }}'
+    #     # Create a initial pose topic publish call
+    #     message = '{header: {frame_id: map}, pose: {pose: {position: {x: ' + \
+    #         robot['x_pose'] + ', y: ' + robot['y_pose'] + \
+    #         ', z: 0.1}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0000000}}, }}'
 
-        initial_pose_cmd = ExecuteProcess(
-            cmd=['ros2', 'topic', 'pub', '-t', '3', '--qos-reliability', 'reliable', namespace + ['/initialpose'],
-                'geometry_msgs/PoseWithCovarianceStamped', message],
-            output='screen'
-        )
+    #     initial_pose_cmd = ExecuteProcess(
+    #         cmd=['ros2', 'topic', 'pub', '-t', '3', '--qos-reliability', 'reliable', namespace + ['/initialpose'],
+    #             'geometry_msgs/PoseWithCovarianceStamped', message],
+    #         output='screen'
+    #     )
 
-        rviz_cmd = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                os.path.join(nav_launch_dir, 'rviz_launch.py')),
-                launch_arguments={'use_sim_time': use_sim_time, 
-                                  'namespace': namespace,
-                                  'use_namespace': 'True',
-                                  'rviz_config': rviz_config_file, 'log_level': 'warn'}.items(),
-                                   condition=IfCondition(enable_rviz)
-                                    )
+    #     rviz_cmd = IncludeLaunchDescription(
+    #         PythonLaunchDescriptionSource(
+    #             os.path.join(nav_launch_dir, 'rviz_launch.py')),
+    #             launch_arguments={'use_sim_time': use_sim_time, 
+    #                               'namespace': namespace,
+    #                               'use_namespace': 'True',
+    #                               'rviz_config': rviz_config_file, 'log_level': 'warn'}.items(),
+    #                                condition=IfCondition(enable_rviz)
+    #                                 )
 
-        drive_turtlebot3_burger = Node(
-            package='turtlebot3_gazebo', executable='turtlebot3_drive',
-            namespace=namespace, output='screen',
-            condition=IfCondition(enable_drive),
-        )
+    #     drive_turtlebot3_burger = Node(
+    #         package='turtlebot3_gazebo', executable='turtlebot3_drive',
+    #         namespace=namespace, output='screen',
+    #         condition=IfCondition(enable_drive),
+    #     )
 
-        # Use RegisterEventHandler to ensure next robot rviz launch happens 
-        # only after all robots are spawned
-        post_spawn_event = RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=last_action,
-                on_exit=[initial_pose_cmd, rviz_cmd, drive_turtlebot3_burger],
-            )
-        )
+    #     # Use RegisterEventHandler to ensure next robot rviz launch happens 
+    #     # only after all robots are spawned
+    #     post_spawn_event = RegisterEventHandler(
+    #         event_handler=OnProcessExit(
+    #             target_action=last_action,
+    #             on_exit=[initial_pose_cmd, rviz_cmd, drive_turtlebot3_burger],
+    #         )
+    #     )
 
-        # Perform next rviz and other node instantiation after the previous intialpose request done
-        last_action = initial_pose_cmd
+    #     # Perform next rviz and other node instantiation after the previous intialpose request done
+    #     last_action = initial_pose_cmd
 
-        ld.add_action(post_spawn_event)
-        ld.add_action(declare_params_file_cmd)
+    #     ld.add_action(post_spawn_event)
+    #     ld.add_action(declare_params_file_cmd)
         
     return ld
