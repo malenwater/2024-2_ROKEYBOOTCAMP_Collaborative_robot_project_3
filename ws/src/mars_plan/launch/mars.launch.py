@@ -1,19 +1,3 @@
-#!/usr/bin/env python3
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# Authors: Arshad Mehmood
-
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -256,5 +240,16 @@ def generate_launch_description():
         ld.add_action(post_spawn_event)
         ld.add_action(declare_params_file_cmd)
     ######################
+    # Create state publisher node for that instance
+    
+    launch_file_dir = os.path.join(get_package_share_directory('mars_plan'), 'launch')
+    spawn_launch_file = os.path.join(launch_file_dir, 'gold.launch.py')
+
+    # 다른 런치 파일 포함
+    gold_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(spawn_launch_file)
+    )
+    
+    ld.add_action(gold_launch)
 
     return ld

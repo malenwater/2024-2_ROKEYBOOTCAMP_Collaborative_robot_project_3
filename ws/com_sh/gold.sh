@@ -1,0 +1,1 @@
+ros2 launch mars_plan gold.launch.py 
