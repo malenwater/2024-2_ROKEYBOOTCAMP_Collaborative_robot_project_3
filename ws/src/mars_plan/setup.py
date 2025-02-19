@@ -33,6 +33,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'control_gui.py=mars_plan.control_gui:main',
         ],
     },
 )

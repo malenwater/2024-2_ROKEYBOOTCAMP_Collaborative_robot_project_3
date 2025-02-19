@@ -11,6 +11,15 @@ from launch.conditions import IfCondition
 import launch.logging
 import xacro
 
+'''
+prove.launch.py는 로봇의 URDF 모델을 Gazebo에서 사용할 수 있도록 설정하는 역할
+
+1. Xacro 파일(turtlebot3_waffle.xacro)을 URDF로 변환
+2. 변환된 URDF 데이터를 /robot_description에 저장
+3. robot_state_publisher를 실행하여 로봇 상태를 방송
+4. ROS 2 시스템이 Gazebo에서 로봇을 제대로 불러올 수 있도록 함
+'''
+
 def generate_launch_description():
     ld = LaunchDescription()
 

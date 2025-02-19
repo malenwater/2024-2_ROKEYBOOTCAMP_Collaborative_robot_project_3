@@ -191,51 +191,52 @@ def generate_launch_description():
 
         # Save last instance for next RegisterEventHandler
         last_action = spawn_turtlebot3_burger
-        
-    # for robot in robots:
 
-    #     namespace = [ '/' + robot['name'] ]
+    # -0-------
+    for robot in robots:
 
-    #     # Create a initial pose topic publish call
-    #     message = '{header: {frame_id: map}, pose: {pose: {position: {x: ' + \
-    #         robot['x_pose'] + ', y: ' + robot['y_pose'] + \
-    #         ', z: 0.1}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0000000}}, }}'
+        namespace = [ '/' + robot['name'] ]
 
-    #     initial_pose_cmd = ExecuteProcess(
-    #         cmd=['ros2', 'topic', 'pub', '-t', '3', '--qos-reliability', 'reliable', namespace + ['/initialpose'],
-    #             'geometry_msgs/PoseWithCovarianceStamped', message],
-    #         output='screen'
-    #     )
+        # Create a initial pose topic publish call
+        message = '{header: {frame_id: map}, pose: {pose: {position: {x: ' + \
+            robot['x_pose'] + ', y: ' + robot['y_pose'] + \
+            ', z: 0.1}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0000000}}, }}'
 
-    #     rviz_cmd = IncludeLaunchDescription(
-    #         PythonLaunchDescriptionSource(
-    #             os.path.join(nav_launch_dir, 'rviz_launch.py')),
-    #             launch_arguments={'use_sim_time': use_sim_time, 
-    #                               'namespace': namespace,
-    #                               'use_namespace': 'True',
-    #                               'rviz_config': rviz_config_file, 'log_level': 'warn'}.items(),
-    #                                condition=IfCondition(enable_rviz)
-    #                                 )
+        initial_pose_cmd = ExecuteProcess(
+            cmd=['ros2', 'topic', 'pub', '-t', '3', '--qos-reliability', 'reliable', namespace + ['/initialpose'],
+                'geometry_msgs/PoseWithCovarianceStamped', message],
+            output='screen'
+        )
 
-    #     drive_turtlebot3_burger = Node(
-    #         package='turtlebot3_gazebo', executable='turtlebot3_drive',
-    #         namespace=namespace, output='screen',
-    #         condition=IfCondition(enable_drive),
-    #     )
+        rviz_cmd = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(nav_launch_dir, 'rviz_launch.py')),
+                launch_arguments={'use_sim_time': use_sim_time, 
+                                  'namespace': namespace,
+                                  'use_namespace': 'True',
+                                  'rviz_config': rviz_config_file, 'log_level': 'warn'}.items(),
+                                   condition=IfCondition(enable_rviz)
+                                    )
 
-    #     # Use RegisterEventHandler to ensure next robot rviz launch happens 
-    #     # only after all robots are spawned
-    #     post_spawn_event = RegisterEventHandler(
-    #         event_handler=OnProcessExit(
-    #             target_action=last_action,
-    #             on_exit=[initial_pose_cmd, rviz_cmd, drive_turtlebot3_burger],
-    #         )
-    #     )
+        drive_turtlebot3_burger = Node(
+            package='turtlebot3_gazebo', executable='turtlebot3_drive',
+            namespace=namespace, output='screen',
+            condition=IfCondition(enable_drive),
+        )
 
-    #     # Perform next rviz and other node instantiation after the previous intialpose request done
-    #     last_action = initial_pose_cmd
+        # Use RegisterEventHandler to ensure next robot rviz launch happens 
+        # only after all robots are spawned
+        post_spawn_event = RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=last_action,
+                on_exit=[initial_pose_cmd, rviz_cmd, drive_turtlebot3_burger],
+            )
+        )
 
-    #     ld.add_action(post_spawn_event)
-    #     ld.add_action(declare_params_file_cmd)
+        # Perform next rviz and other node instantiation after the previous intialpose request done
+        last_action = initial_pose_cmd
+
+        ld.add_action(post_spawn_event)
+        ld.add_action(declare_params_file_cmd)
         
     return ld

@@ -14,8 +14,6 @@
 #
 # Authors: Arshad Mehmood
 
-# 이동 가능 코드 
-
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -141,8 +139,6 @@ def generate_launch_description():
 
     # Remapping is required for state publisher otherwise /tf and /tf_static 
     # will get be published on root '/' namespace
-
-    # 각 로봇에 대해 개별 네임스페이스를 적용하는 설정
     remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
 
     last_action = None
@@ -225,10 +221,9 @@ def generate_launch_description():
         last_action = spawn_turtlebot3_burger
     ######################
 
-    # rviz2 실행 코드
     ######################
     # Start rviz nodes and drive nodes after the last robot is spawned
-    # for robot in robots:
+    for robot in robots:
 
         namespace = [ '/' + robot['name'] ]
 

@@ -6,9 +6,6 @@ from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
 import xacro
 
-# turtlebot3로봇 상태 퍼블리셔를 실행
-# urdf 을 로드하여 로봇의 구조를 정의
-
 def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
     # 패키지 경로

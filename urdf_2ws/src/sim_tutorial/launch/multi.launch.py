@@ -24,6 +24,9 @@ yaw = 1.57
 def generate_launch_description():
     package_name = "sim_tutorial"
 
+    # robot_3.launch.py/ robot_4.launch.py 를 실행하여 두대의 로봇을 불러온다
+    # -> gazebo에서 두대의 로봇을 스폰한다.
+
     rsp3 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [os.path.join(get_package_share_directory(package_name), "launch", "robot_3.launch.py")]
@@ -39,6 +42,7 @@ def generate_launch_description():
     )
 
     # Include the Gazebo launch file, provided by the gazebo_ros package
+    # gazebo.launch.py -> gazebo시뮬레이션을 시작.
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [os.path.join(get_package_share_directory("gazebo_ros"), "launch", "gazebo.launch.py")]
