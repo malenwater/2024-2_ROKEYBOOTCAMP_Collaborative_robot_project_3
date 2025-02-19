@@ -55,7 +55,7 @@ def generate_launch_description():
         description='Full path to the RVIZ config file to use')
 
     urdf = os.path.join(
-        mars_plan, 'urdf', 'turtlebot3_' + TURTLEBOT3_MODEL + '.urdf'
+        mars_plan, 'urdf', 'turtlebot3_' + TURTLEBOT3_MODEL + '_pi.urdf'
     )
 
     params_file = LaunchConfiguration('nav_params_file')
@@ -133,28 +133,28 @@ def generate_launch_description():
             output='screen',
         )
 
-        bringup_cmd = IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    os.path.join(nav_launch_dir, 'bringup_launch.py')),
-                    launch_arguments={  
-                                    'slam': 'False',
-                                    'namespace': namespace,
-                                    'use_namespace': 'True',
-                                    'map': '',
-                                    'map_server': 'False',
-                                    'params_file': params_file,
-                                    'default_bt_xml_filename': os.path.join(
-                                        get_package_share_directory('nav2_bt_navigator'),
-                                        'behavior_trees', 'navigate_w_replanning_and_recovery.xml'),
-                                    'autostart': 'true',
-                                    'use_sim_time': use_sim_time, 'log_level': 'warn'}.items()
-                                    )
+        # bringup_cmd = IncludeLaunchDescription(
+        #         PythonLaunchDescriptionSource(
+        #             os.path.join(nav_launch_dir, 'bringup_launch.py')),
+        #             launch_arguments={  
+        #                             'slam': 'False',
+        #                             'namespace': namespace,
+        #                             'use_namespace': 'True',
+        #                             'map': '',
+        #                             'map_server': 'False',
+        #                             'params_file': params_file,
+        #                             'default_bt_xml_filename': os.path.join(
+        #                                 get_package_share_directory('nav2_bt_navigator'),
+        #                                 'behavior_trees', 'navigate_w_replanning_and_recovery.xml'),
+        #                             'autostart': 'true',
+        #                             'use_sim_time': use_sim_time, 'log_level': 'warn'}.items()
+        #                             )
         
         if last_action is None:
             # Call add_action directly for the first robot to facilitate chain instantiation via RegisterEventHandler
             ld.add_action(turtlebot_state_publisher)
             ld.add_action(spawn_turtlebot3_burger)
-            ld.add_action(bringup_cmd)
+            # ld.add_action(bringup_cmd)
 
         else:
             # Use RegisterEventHandler to ensure next robot creation happens only after the previous one is completed.
@@ -164,7 +164,7 @@ def generate_launch_description():
                     target_action=last_action,
                     on_exit=[spawn_turtlebot3_burger,
                             turtlebot_state_publisher,
-                            bringup_cmd],
+                            ],
                 )
             )
 
