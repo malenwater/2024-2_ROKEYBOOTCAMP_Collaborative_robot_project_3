@@ -35,6 +35,7 @@ setup(
     entry_points={
         'console_scripts': [
             'control_gui.py=mars_plan.control_gui:main',
+            'MainServer = mars_plan.MainServer:main',
         ],
     },
 )
