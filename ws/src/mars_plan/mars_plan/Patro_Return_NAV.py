@@ -17,6 +17,7 @@ class Patro_Return_NAV(Node):
         self.action_client = ActionClient(self, NavigateToPose, '/'+ NAMESPACE + '/navigate_to_pose')
         self.MainServer = MainServer
         self.targets = target
+        self.goal_handle = None
         
         self.get_logger().info(f'{self.NAME} {self.NAMESPACE} end')
     
@@ -40,13 +41,13 @@ class Patro_Return_NAV(Node):
         while not goal_future.done():
             time.sleep(0.1)  # CPU 과부하 방지
 
-        goal_handle = goal_future.result()
-        if not goal_handle or not goal_handle.accepted:
+        self.goal_handle = goal_future.result()
+        if not self.goal_handle or not self.goal_handle.accepted:
             self.get_logger().error("Goal rejected by action server")
             return
         
         # 결과 기다리기 (로봇이 목표에 도착할 때까지 대기)
-        result_future = goal_handle.get_result_async()
+        result_future = self.goal_handle.get_result_async()
         while not result_future.done():
             time.sleep(0.1)  # CPU 과부하 방지
 
@@ -55,7 +56,27 @@ class Patro_Return_NAV(Node):
             self.get_logger().error("Goal was aborted")
         else:
             self.get_logger().info("Goal reached successfully")
+            
+    def cancel_goal(self):
+        """지정한 시간 후 목표 취소"""
+        self.get_logger().info("Attempting to cancel goal...")
 
+        if not self.goal_handle:
+            self.get_logger().error("No goal handle available to cancel")
+            return
+        
+        cancel_future = self.goal_handle.cancel_goal_async()
+        cancel_future.add_done_callback(self.cancel_response_callback)
+
+    def cancel_response_callback(self, future):
+        """취소 요청 후 응답 콜백"""
+        cancel_response = future.result()
+        if cancel_response.return_code == 0:
+            self.get_logger().info("Goal successfully cancelled")
+        else:
+            self.get_logger().error(f"Failed to cancel goal, return code: {cancel_response.return_code}")
+        self.goal_handle = None
+        
     def execute_navigation_return(self):
         self.RUN_FLAG = True
         self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_return THREAD start')

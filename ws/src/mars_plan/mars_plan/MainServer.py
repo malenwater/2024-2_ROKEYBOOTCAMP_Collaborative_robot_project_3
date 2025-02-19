@@ -77,10 +77,12 @@ class MainServer(Node):
         elif command == "2" and self.ROBOT_NODE_PATROL_FLAG[robot] != "2": # 귀환
             self.get_logger().info(f'run_control start {command}')
             self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
+            self.ROBOT_NODE_PATROL[robot].cancel_goal()
             time.sleep(2)
             self.ROBOT_NODE_PATROL_FLAG[robot] = "2"
         elif command == "3": # 정지
             self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
+            self.ROBOT_NODE_PATROL[robot].cancel_goal()
         else:
             self.get_logger().info(f'User insert wrong command')
         self.get_logger().info(f'run_control stop')
