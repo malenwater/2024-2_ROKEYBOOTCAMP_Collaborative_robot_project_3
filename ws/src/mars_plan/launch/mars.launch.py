@@ -32,7 +32,7 @@ def generate_launch_description():
 
     # Names and poses of the robots
     robots = [
-        {'name': 'tb1', 'x_pose': '2.0', 'y_pose': '5.0', 'z_pose': '0.01'},
+        {'name': 'tb1', 'x_pose': '2.5', 'y_pose': '4.5', 'z_pose': '0.01'},
         {'name': 'tb2', 'x_pose': '2.5', 'y_pose': '5.0', 'z_pose': '0.01'},
         #{'name': 'tb3', 'x_pose': '1.5', 'y_pose': '-0.5', 'z_pose': 0.01},
         #{'name': 'tb4', 'x_pose': '1.5', 'y_pose': '0.5', 'z_pose': 0.01},
@@ -161,7 +161,7 @@ def generate_launch_description():
                 '-entity', robot['name'],
                 '-robot_namespace', namespace,
                 '-x', robot['x_pose'], '-y', robot['y_pose'],
-                '-z', '0.01', '-Y', '0.0',
+                '-z', robot['z_pose'], '-Y', '0.0',
                 '-unpause',
             ],
             output='screen',
