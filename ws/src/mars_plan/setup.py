@@ -22,6 +22,7 @@ setup(
         (os.path.join('share', package_name, 'models', 'turtlebot3_waffle_pi'), glob('models/turtlebot3_waffle_pi/*.*')),       
         (os.path.join('share', package_name, 'params'), glob('params/*.*')),       
         (os.path.join('share', package_name, 'rviz'), glob('rviz/*.*')),       
+        (os.path.join('share', package_name, 'map'), glob('map/*.*')),       
     ],
     install_requires=['setuptools'],
     zip_safe=True,
