@@ -21,6 +21,11 @@ class ModelManager(Node):
         while not self.delete_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Delete 서비스가 준비되지 않았습니다. 다시 기다립니다...')
 
+    def make_GOLD(self):
+        urdf_file_path = os.path.join(pkg_share, 'urdf', 'gold.sdf')  # SDF 파일 경로
+        self.spawn_model('gold', urdf_file_path, 5.0, -2.0, 0.0)  # boom 모델 생성
+
+
     def delete_GOLD(self):
         
         urdf_file_path = os.path.join(pkg_share, 'urdf', 'boom.urdf')  # SDF 파일 경로

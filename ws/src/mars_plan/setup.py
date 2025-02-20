@@ -37,6 +37,7 @@ setup(
             'control_gui.py=mars_plan.control_gui:main',
             'MainServer = mars_plan.MainServer:main',
             'boom = mars_plan.obj_ctl:main',
+            'UI = mars_plan.RobotControlUI:main',
         ],
     },
 )

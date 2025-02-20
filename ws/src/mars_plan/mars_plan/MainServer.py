@@ -111,14 +111,13 @@ class MainServer(Node):
                 self.ROBOT_NODE_PATROL[robot].cancel_goal()
                 self.GoldDetector_FLAG[robot] = False
                 
-            elif command == "4": # 정지
-                self.ROBOT_NODE_PATROL_FLAG[robot] = "3"
-                self.ROBOT_NODE_PATROL[robot].send_goal(2.21324182152748108, 2.515588569641113)
-                self.GoldDetector_FLAG[robot] = True
-            elif command == "5": # 정지
-                self.ROBOT_NODE_PATROL_FLAG[robot] = "3"
-                self.ROBOT_NODE_PATROL[robot].send_goal(1.21324182152748108, 1.15588569641113)
-                self.GoldDetector_FLAG[robot] = True
+            elif command == "4": # 궤도 폭격
+                self.ROBOT_NODE_PATROL_FLAG[robot] = "4"
+                self.delete_ModelManager.delete_GOLD()
+                
+            elif command == "5": # 광물 생성
+                self.ROBOT_NODE_PATROL_FLAG[robot] = "5"
+                self.delete_ModelManager.make_GOLD()
             self.robot =None
             self.command = None
             time.sleep(0.5)
