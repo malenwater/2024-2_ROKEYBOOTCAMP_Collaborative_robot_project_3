@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="Color Tutorial Model">
+    <static>true</static>
+    <link name="robot_link">
+      <!-- Body Collision -->
+      <collision name="body_collision">
+        <geometry>
+          <box>
+            <size>1 1 1</size>
+          </box>
+        </geometry>
+      </collision>
+      
+      <visual name="wheel1_visual">
+        <material> <!-- Wheel material -->
+          <ambient>1 1 0 1</ambient> <!-- Yellow color -->
+          <diffuse>1 1 0 1</diffuse> <!-- Yellow color -->
+          <specular>0 0 0 0</specular>
+          <emissive>0 0 0 1</emissive>
+        </material> <!-- End wheel material -->
+        <pose>-0.2 0 -0.25 0 1.57079 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <!-- Wheel1 Collision -->
+      <collision name="wheel1_collision">
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+
+      <visual name="wheel2_visual">
+        <pose>0.2 0 -0.25 0 1.57079 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <!-- Wheel2 Collision -->
+      <collision name="wheel2_collision">
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+
+      <visual name="power_led_visual">
+        <pose>0.225 0.225 0.25 0 0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.003</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <ambient>1 1 0 1</ambient> <!-- Yellow color -->
+          <diffuse>1 1 0 1</diffuse> <!-- Yellow color -->
+          <specular>0 0 0 0</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <!-- Power LED Collision -->
+      <collision name="power_led_collision">
+        <geometry>
+          <sphere>
+            <radius>0.003</radius>
+          </sphere>
+        </geometry>
+      </collision>
+
+      <visual name="body_visual">
+        <geometry>
+          <box>
+            <size>0.5 0.5 0.5</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>1 1 0 1</ambient> <!-- Yellow color -->
+          <diffuse>1 1 0 1</diffuse> <!-- Yellow color -->
+          <specular>0 0 0 0</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <!-- Body Collision -->
+      <collision name="body_visual_collision">
+        <geometry>
+          <box>
+            <size>0.5 0.5 0.5</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name="head_visual">
+        <pose>0 0 0.25 0 0 -2.5</pose>
+        <geometry>
+          <sphere>
+            <radius>0.25</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <ambient>1 1 0 1</ambient> <!-- Yellow color -->
+          <diffuse>1 1 0 1</diffuse> <!-- Yellow color -->
+          <specular>0 0 0 0</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+      <!-- Head Collision -->
+      <collision name="head_visual_collision">
+        <geometry>
+          <sphere>
+            <radius>0.25</radius>
+          </sphere>
+        </geometry>
+      </collision>
+
+    </link>
+  </model>
+</sdf>
