@@ -67,7 +67,7 @@ class GoldDetector(Node):
 
     def image_callback(self, msg):
         if self.MainServer.get_GoldDetector_FLAG(self.ORDER) == False:
-            # self.get_logger().info(f'get_GoldDetector_FLAG Faslse')
+            self.get_logger().info(f'get_GoldDetector_FLAG Faslse')
             return
         
         self.get_logger().info(f'get_GoldDetector_FLAG True')
@@ -81,7 +81,8 @@ class GoldDetector(Node):
         
         largest_contour = max(contours, key=cv2.contourArea, default=None)
         
-        if largest_contour is not None and cv2.contourArea(largest_contour) > 500:
+        self.get_logger().info(f'get_GoldDetector_FLAG {largest_contour}')
+        if largest_contour is not None :
             # self.cancel_nav2()
             self.get_logger().info("check stop")
             self.MainServer.stop_NAV(self.ORDER)

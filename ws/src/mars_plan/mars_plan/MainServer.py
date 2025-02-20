@@ -23,9 +23,9 @@ class MainServer(Node):
         self.GoldDetector = {}
         self.GoldDetector_FLAG = {}
         self.ROBOT_PATROL_WAYPOINT = { "1" : [
-                                            (1.6368083953857422, -6.828545570373535),  # 공용좌표 (상단)
+                                            # (1.6368083953857422, -6.828545570373535),  # 공용좌표 (상단)
                                             
-                                            (1.9283926486968994, 5.010260581970215),  # 6시
+                                            # (1.9283926486968994, 5.010260581970215),  # 6시
                                             (6.535802364349365, 4.402944087982178),  # 7시
                                             (6.9502177238464355, -1.0246244668960571),  # 9시
                                             (7.321432113647461, -5.645576000213623),  # 11시
@@ -33,6 +33,8 @@ class MainServer(Node):
                                             (2.022683620452881, -1.4855573177337646)  # 공용좌표 (중앙)
                                         ],
                                  "2" : [
+                                            (1.51324182152748108, 3.315588569641113),
+
                                             (-0.11324182152748108, 4.215588569641113),  # 6시
                                             (-2.5168874263763428, 1.9160888195037842),  # 5시
                                             (-4.162641525268555, -4.875141143798828),  # 3시
@@ -96,7 +98,7 @@ class MainServer(Node):
             if command == "1" and self.ROBOT_NODE_PATROL_FLAG[robot] != "1": # 순찰
                 self.get_logger().info(f'run_control start {command} command')
                 self.ROBOT_NODE_PATROL_FLAG[robot] = "1"
-                # self.GoldDetector_FLAG[robot] = True
+                self.GoldDetector_FLAG[robot] = True
                 self.get_logger().info(f'run_control check {self.GoldDetector_FLAG[robot] }')
                 
             elif command == "2" and self.ROBOT_NODE_PATROL_FLAG[robot] != "2": # 귀환
@@ -108,6 +110,8 @@ class MainServer(Node):
                 self.ROBOT_NODE_PATROL[robot].cancel_goal()
                 self.GoldDetector_FLAG[robot] = False
 
+            self.robot = None
+            self.command = None
             time.sleep(0.5)
         self.get_logger().info(f'run_control end')
     
