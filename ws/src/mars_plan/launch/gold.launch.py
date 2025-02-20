@@ -12,8 +12,8 @@ def generate_launch_description():
     # robot 딕셔너리 정의 (예시로 좌표 설정)
     robot = {
         'name': 'gold',
-        'x_pose': '2.0',
-        'y_pose': '2.0',
+        'x_pose': '7.0',
+        'y_pose': '0.0',
         'z_pose': '0.0'
     }
     

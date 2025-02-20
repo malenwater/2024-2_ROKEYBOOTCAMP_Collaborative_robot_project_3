@@ -6,6 +6,7 @@ from rclpy.executors import MultiThreadedExecutor
 from .Patro_Return_NAV import Patro_Return_NAV
 from .UserCommand import UserCommand
 from .GoldDetector import GoldDetector
+from .obj_ctl import ModelManager
 
 class MainServer(Node):
     """ROS2 서비스 노드 (YOLO 실행 요청을 처리)"""
@@ -77,6 +78,8 @@ class MainServer(Node):
         self.worker_thread = threading.Thread(target=self.run_control, daemon=True)
         self.worker_thread.start()
         
+        self.delete_ModelManager = ModelManager()
+        
         self.get_logger().info(f'MainServer Setiing Done')
         self.get_logger().info(f'MainServer end')
         
@@ -119,6 +122,7 @@ class MainServer(Node):
             self.robot =None
             self.command = None
             time.sleep(0.5)
+            
         self.get_logger().info(f'run_control end')
     
     def stop_THREAD(self):
@@ -149,13 +153,21 @@ class MainServer(Node):
         x = float(x)
         y = float(y)
         self.get_logger().info(f'collect_robots {x}, {y}, {robot} start')
-        for item in [i for i in self.ROBOT_ORDER if i != robot]:
+        new_lst = [x for x in self.ROBOT_ORDER if x != "1"]
+        self.get_logger().info(f'collect_robots {new_lst} new_lst')
+        
+        for item in new_lst:
             self.stop_NAV(item)
             self.GoldDetector_FLAG[item] = False
             self.get_logger().info(f'collect_robots {item} runnig')
             self.ROBOT_NODE_PATROL[item].send_goal(x,y)
+        
+        self.delete_ModelManager.delete_GOLD()
+        self.get_logger().info(f'delete_GOLD')
+        
+        self.ROBOT_NODE_PATROL_FLAG[robot] = "2"
         self.get_logger().info(f'collect_robots {x}, {y}, {robot} end')
-    
+        
     def get_ROBOT_NODE_PATROL_FLAG(self,robot):
         return self.ROBOT_NODE_PATROL_FLAG[robot] 
     
@@ -179,6 +191,7 @@ def main():
     executor = MultiThreadedExecutor(num_threads=20)
     executor.add_node(node) 
     executor.add_node(node.ROBOT_NODE_COMMAND) 
+    executor.add_node(node.delete_ModelManager) 
     for ORDER in node.ROBOT_ORDER:
         executor.add_node(node.ROBOT_NODE_PATROL[ORDER])
         executor.add_node(node.GoldDetector[ORDER])
