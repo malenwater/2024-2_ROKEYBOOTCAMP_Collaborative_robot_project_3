@@ -25,7 +25,7 @@ class MainServer(Node):
         self.ROBOT_PATROL_WAYPOINT = { "1" : [
                                             # (1.6368083953857422, -6.828545570373535),  # 공용좌표 (상단)
                                             
-                                            # (1.9283926486968994, 5.010260581970215),  # 6시
+                                            (1.9283926486968994, 5.010260581970215),  # 6시
                                             (6.535802364349365, 4.402944087982178),  # 7시
                                             (6.9502177238464355, -1.0246244668960571),  # 9시
                                             (7.321432113647461, -5.645576000213623),  # 11시
@@ -33,8 +33,6 @@ class MainServer(Node):
                                             (2.022683620452881, -1.4855573177337646)  # 공용좌표 (중앙)
                                         ],
                                  "2" : [
-                                            (1.51324182152748108, 3.315588569641113),
-
                                             (-0.11324182152748108, 4.215588569641113),  # 6시
                                             (-2.5168874263763428, 1.9160888195037842),  # 5시
                                             (-4.162641525268555, -4.875141143798828),  # 3시
@@ -109,8 +107,16 @@ class MainServer(Node):
                 self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
                 self.ROBOT_NODE_PATROL[robot].cancel_goal()
                 self.GoldDetector_FLAG[robot] = False
-
-            self.robot = None
+                
+            elif command == "4": # 정지
+                self.ROBOT_NODE_PATROL_FLAG[robot] = "3"
+                self.ROBOT_NODE_PATROL[robot].send_goal(2.21324182152748108, 2.515588569641113)
+                self.GoldDetector_FLAG[robot] = True
+            elif command == "5": # 정지
+                self.ROBOT_NODE_PATROL_FLAG[robot] = "3"
+                self.ROBOT_NODE_PATROL[robot].send_goal(1.21324182152748108, 1.15588569641113)
+                self.GoldDetector_FLAG[robot] = True
+            self.robot =None
             self.command = None
             time.sleep(0.5)
         self.get_logger().info(f'run_control end')
@@ -143,25 +149,28 @@ class MainServer(Node):
         x = float(x)
         y = float(y)
         self.get_logger().info(f'collect_robots {x}, {y}, {robot} start')
-        # for item in [i for i in self.ROBOT_ORDER if i != robot]:
-        #     self.stop_NAV(item)
-        #     self.get_logger().info(f'collect_robots {item} runnig')
-        #     self.ROBOT_NODE_PATROL[item].send_goal(x,y)
+        for item in [i for i in self.ROBOT_ORDER if i != robot]:
+            self.stop_NAV(item)
+            self.GoldDetector_FLAG[item] = False
+            self.get_logger().info(f'collect_robots {item} runnig')
+            self.ROBOT_NODE_PATROL[item].send_goal(x,y)
         self.get_logger().info(f'collect_robots {x}, {y}, {robot} end')
     
     def get_ROBOT_NODE_PATROL_FLAG(self,robot):
         return self.ROBOT_NODE_PATROL_FLAG[robot] 
+    
     def get_GoldDetector_FLAG(self,robot):
         # self.get_logger().info(f'get_GoldDetector_FLAG check {self.GoldDetector_FLAG[robot] }, {robot}')
         return self.GoldDetector_FLAG[robot] 
+    
     def set_GoldDetector_FLAG(self,robot, data):
         self.get_logger().info(f'get_GoldDetector_FLAG check {self.GoldDetector_FLAG[robot] }, {robot}')
         self.GoldDetector_FLAG[robot] = data
+        
     def stop_NAV(self,robot):
-        if self.ROBOT_NODE_PATROL_FLAG[robot] != "0":
-            self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
-            self.ROBOT_NODE_PATROL[robot].cancel_goal()
-            time.sleep(2)
+        self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
+        self.ROBOT_NODE_PATROL[robot].cancel_goal()
+        
 def main():
     rclpy.init()
     node = MainServer()

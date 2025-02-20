@@ -81,7 +81,7 @@ class GoldDetector(Node):
         
         largest_contour = max(contours, key=cv2.contourArea, default=None)
         
-        self.get_logger().info(f'get_GoldDetector_FLAG {largest_contour}')
+        self.get_logger().info(f'get_GoldDetector_FLAG {largest_contour is not None}')
         if largest_contour is not None :
             # self.cancel_nav2()
             self.get_logger().info("check stop")
@@ -95,15 +95,15 @@ class GoldDetector(Node):
             twist_msg = Twist()
             
             if abs(offset_x) > 20:
-                twist_msg.angular.z = 0.2 if offset_x < 0 else -0.2
+                twist_msg.angular.z = 0.08 if offset_x < 0 else -0.2
             else:
                 twist_msg.angular.z = 0.0
             
-            if h / self.frame_height >= 0.3:
+            if h / self.frame_height >= 0.6:
                 twist_msg.linear.x = 0.0
                 self.get_logger().info(f"🛑 멈춤! {self.NAMESPACE}에게 위치 전송")
-                # self.MainServer.collect_robots(self.x,self.y,self.ORDER)
-                # self.MainServer.set_GoldDetector_FLAG(self.ORDER,False)
+                self.MainServer.collect_robots(self.x,self.y,self.ORDER)
+                self.MainServer.set_GoldDetector_FLAG(self.ORDER,False)
                 # self.publish_position()
             else:
                 twist_msg.linear.x = 0.1
