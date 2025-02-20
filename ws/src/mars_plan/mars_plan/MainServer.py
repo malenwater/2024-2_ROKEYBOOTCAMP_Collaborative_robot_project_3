@@ -86,6 +86,7 @@ class MainServer(Node):
         elif command == "3": # 정지
             self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
             self.ROBOT_NODE_PATROL[robot].cancel_goal()
+            self.GoldDetector_FLAG[robot] = False
         else:
             self.get_logger().info(f'User insert wrong command')
         self.get_logger().info(f'run_control stop')
@@ -113,15 +114,30 @@ class MainServer(Node):
                 self.ROBOT_NODE_PATROL_THREAD[ORDER].join(timeout=1)
         
         self.get_logger().info(f'stop_THREAD end')
-        
+    
+    def collect_robots(self, x, y, robot):
+        x = float(x)
+        y = float(y)
+        self.get_logger().info(f'collect_robots {x}, {y}, {robot} start')
+        # for item in [i for i in self.ROBOT_ORDER if i != robot]:
+        #     self.stop_NAV(item)
+        #     self.get_logger().info(f'collect_robots {item} runnig')
+        #     self.ROBOT_NODE_PATROL[item].send_goal(x,y)
+        self.get_logger().info(f'collect_robots {x}, {y}, {robot} end')
+    
     def get_ROBOT_NODE_PATROL_FLAG(self,robot):
         return self.ROBOT_NODE_PATROL_FLAG[robot] 
     def get_GoldDetector_FLAG(self,robot):
         self.get_logger().info(f'get_GoldDetector_FLAG check {self.GoldDetector_FLAG[robot] }, {robot}')
         return self.GoldDetector_FLAG[robot] 
+    def set_GoldDetector_FLAG(self,robot, data):
+        self.get_logger().info(f'get_GoldDetector_FLAG check {self.GoldDetector_FLAG[robot] }, {robot}')
+        self.GoldDetector_FLAG[robot] = data
     def stop_NAV(self,robot):
-        self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
-        self.ROBOT_NODE_PATROL[robot].cancel_goal()
+        if self.ROBOT_NODE_PATROL_FLAG[robot] != "0":
+            self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
+            self.ROBOT_NODE_PATROL[robot].cancel_goal()
+            time.sleep(2)
 def main():
     rclpy.init()
     node = MainServer()

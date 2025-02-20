@@ -61,7 +61,7 @@ class Patro_Return_NAV(Node):
         
     def cancel_goal(self):
         """목표 취소 요청 후 동기적으로 대기"""
-        self.get_logger().info("Attempting to cancel goal...")
+        self.get_logger().info(f"{self.NAMESPACE} Attempting to cancel goal...")
 
         if not self.goal_handle:
             self.get_logger().error("No goal handle available to cancel")
