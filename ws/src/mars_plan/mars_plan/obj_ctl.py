@@ -27,7 +27,7 @@ class ModelManager(Node):
         self.get_logger().info(f'{urdf_file_path} ')
         
         # boom 모델 생성
-        self.spawn_model('boom', urdf_file_path, 7.0, 0.0, 0.0)  # boom 모델 생성
+        self.spawn_model('boom', urdf_file_path, 5.0, -2.0, 0.0)  # boom 모델 생성
 
         # 3초 후에 gold 모델 삭제
         time.sleep(2)
@@ -82,6 +82,7 @@ class ModelManager(Node):
 def main(args=None):
     rclpy.init(args=args)
     manager = ModelManager()
+    manager.delete_GOLD()
     rclpy.spin(manager)
     manager.destroy_node()
     rclpy.shutdown()

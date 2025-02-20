@@ -25,7 +25,7 @@ class GoldDetector(Node):
         self.ORDER = ORDER
         
         self.subscription = self.create_subscription(
-            Image, '/tb1/camera/image_raw', self.image_callback, 10)
+            Image,  '/' + NAMESPACE + '/camera/image_raw', self.image_callback, 10)
         
         # self.nav2_cancel_client = self.create_client(Empty, '/navigation2/cancel')
         self.amcl_pose_subscriber = self.create_subscription(

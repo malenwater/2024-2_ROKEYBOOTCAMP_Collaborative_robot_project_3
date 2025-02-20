@@ -165,7 +165,8 @@ class MainServer(Node):
         self.delete_ModelManager.delete_GOLD()
         self.get_logger().info(f'delete_GOLD')
         
-        self.ROBOT_NODE_PATROL_FLAG[robot] = "2"
+        for item in self.ROBOT_ORDER:
+            self.ROBOT_NODE_PATROL_FLAG[item] = "2"
         self.get_logger().info(f'collect_robots {x}, {y}, {robot} end')
         
     def get_ROBOT_NODE_PATROL_FLAG(self,robot):
