@@ -13,6 +13,8 @@ class MainServer(Node):
         super().__init__('MainServer')
         self.get_logger().info(f'MainServer start')
         self.ROBOT_NUMBER = 2
+        self.robot = None
+        self.command = None
         self.ROBOT_ORDER = []
         self.ROBOT_NAMESPACE ={}
         self.ROBOT_NODE_PATROL = {}
@@ -67,29 +69,47 @@ class MainServer(Node):
                                                         self,
                                                         ORDER,
                                                         self.ROBOT_NAMESPACE[ORDER],)
-            
+        self.running = False
+        
+        self.command_thread = threading.Thread(target=self.ROBOT_NODE_COMMAND.process_messages, daemon=True)
+        self.command_thread.start()
+        
+        self.worker_thread = threading.Thread(target=self.run_control, daemon=True)
+        self.worker_thread.start()
+        
         self.get_logger().info(f'MainServer Setiing Done')
         self.get_logger().info(f'MainServer end')
         
-    def run_control(self, robot, command):
+    def set_robot(self,robot):
+        self.robot = robot
+    def set_command(self,command):
+        self.command = command
+        
+    def run_control(self):
         self.get_logger().info(f'run_control start')
-        if command == "1" and self.ROBOT_NODE_PATROL_FLAG[robot] != "1": # 순찰
-            self.get_logger().info(f'run_control start {command}')
-            self.ROBOT_NODE_PATROL_FLAG[robot] = "1"
-            self.GoldDetector_FLAG[robot] = True
-            self.get_logger().info(f'run_control check {self.GoldDetector_FLAG[robot] }')
+        self.running = True
+        while self.running:
+            robot = self.robot
+            command = self.command
+            # self.get_logger().info(f'run_control check')
             
-        elif command == "2" and self.ROBOT_NODE_PATROL_FLAG[robot] != "2": # 귀환
-            self.get_logger().info(f'run_control start {command}')
-            self.ROBOT_NODE_PATROL_FLAG[robot] = "2"
-            
-        elif command == "3": # 정지
-            self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
-            self.ROBOT_NODE_PATROL[robot].cancel_goal()
-            self.GoldDetector_FLAG[robot] = False
-        else:
-            self.get_logger().info(f'User insert wrong command')
-        self.get_logger().info(f'run_control stop')
+            if command == "1" and self.ROBOT_NODE_PATROL_FLAG[robot] != "1": # 순찰
+                self.get_logger().info(f'run_control start {command} command')
+                self.ROBOT_NODE_PATROL_FLAG[robot] = "1"
+                # self.GoldDetector_FLAG[robot] = True
+                self.get_logger().info(f'run_control check {self.GoldDetector_FLAG[robot] }')
+                
+            elif command == "2" and self.ROBOT_NODE_PATROL_FLAG[robot] != "2": # 귀환
+                self.get_logger().info(f'run_control start {command} command')
+                self.ROBOT_NODE_PATROL_FLAG[robot] = "2"
+                
+            elif command == "3": # 정지
+                self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
+                self.ROBOT_NODE_PATROL[robot].cancel_goal()
+                self.GoldDetector_FLAG[robot] = False
+
+            time.sleep(0.5)
+        self.get_logger().info(f'run_control end')
     
     def stop_THREAD(self):
         self.get_logger().info(f'stop_THREAD start')
@@ -128,7 +148,7 @@ class MainServer(Node):
     def get_ROBOT_NODE_PATROL_FLAG(self,robot):
         return self.ROBOT_NODE_PATROL_FLAG[robot] 
     def get_GoldDetector_FLAG(self,robot):
-        self.get_logger().info(f'get_GoldDetector_FLAG check {self.GoldDetector_FLAG[robot] }, {robot}')
+        # self.get_logger().info(f'get_GoldDetector_FLAG check {self.GoldDetector_FLAG[robot] }, {robot}')
         return self.GoldDetector_FLAG[robot] 
     def set_GoldDetector_FLAG(self,robot, data):
         self.get_logger().info(f'get_GoldDetector_FLAG check {self.GoldDetector_FLAG[robot] }, {robot}')
@@ -143,7 +163,7 @@ def main():
     node = MainServer()
     node.get_logger().info('MainServer main start')
     
-    executor = MultiThreadedExecutor()
+    executor = MultiThreadedExecutor(num_threads=20)
     executor.add_node(node) 
     executor.add_node(node.ROBOT_NODE_COMMAND) 
     for ORDER in node.ROBOT_ORDER:

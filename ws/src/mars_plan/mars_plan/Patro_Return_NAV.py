@@ -39,7 +39,7 @@ class Patro_Return_NAV(Node):
         # 비동기 요청 -> Future 완료될 때까지 대기
         goal_future = self.action_client.send_goal_async(goal_msg)
         while not goal_future.done():
-            time.sleep(0.1)  # CPU 과부하 방지
+            time.sleep(0.5)  # CPU 과부하 방지
 
         self.goal_handle = goal_future.result()
         if not self.goal_handle or not self.goal_handle.accepted:
@@ -49,7 +49,7 @@ class Patro_Return_NAV(Node):
         # 결과 기다리기 (로봇이 목표에 도착할 때까지 대기)
         result_future = self.goal_handle.get_result_async()
         while not result_future.done():
-            time.sleep(0.1)  # CPU 과부하 방지
+            time.sleep(0.5)  # CPU 과부하 방지
 
         result = result_future.result()
         if result.status == 4:
@@ -94,7 +94,7 @@ class Patro_Return_NAV(Node):
         self.RUN_FLAG = True
         self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD start')
         while self.RUN_FLAG:
-            # self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD mode check')
+            self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD mode check')
             if self.MainServer.get_ROBOT_NODE_PATROL_FLAG(self.ORDER) == "1":
                 self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD 1 mode start')
                 idx = 0

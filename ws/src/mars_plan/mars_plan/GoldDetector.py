@@ -67,7 +67,7 @@ class GoldDetector(Node):
 
     def image_callback(self, msg):
         if self.MainServer.get_GoldDetector_FLAG(self.ORDER) == False:
-            self.get_logger().info(f'get_GoldDetector_FLAG Faslse')
+            # self.get_logger().info(f'get_GoldDetector_FLAG Faslse')
             return
         
         self.get_logger().info(f'get_GoldDetector_FLAG True')
