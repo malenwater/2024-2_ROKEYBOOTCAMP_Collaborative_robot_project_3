@@ -7,7 +7,7 @@ import time  # 시간 지연을 위해 추가
 
 class Patro_Return_NAV(Node):
     """ROS2 서비스 노드 (Patro_Return_NAV 실행 요청을 처리)"""
-    def __init__(self,target, NAMESPACE, ORDER, MainServer,NAME):
+    def __init__(self,target, NAMESPACE, ORDER, MainServer,NAME,return_target):
         super().__init__(NAME + NAMESPACE)
         self.get_logger().info(f'{NAME} {NAMESPACE} start')
         self.RUN_FLAG = False
@@ -18,7 +18,7 @@ class Patro_Return_NAV(Node):
         self.MainServer = MainServer
         self.targets = target
         self.goal_handle = None
-        
+        self.return_target = return_target
         self.get_logger().info(f'{self.NAME} {self.NAMESPACE} end')
     
     def send_goal(self, x, y):
@@ -57,8 +57,10 @@ class Patro_Return_NAV(Node):
         else:
             self.get_logger().info("Goal reached successfully")
             
+        self.goal_handle = None
+        
     def cancel_goal(self):
-        """지정한 시간 후 목표 취소"""
+        """목표 취소 요청 후 동기적으로 대기"""
         self.get_logger().info("Attempting to cancel goal...")
 
         if not self.goal_handle:
@@ -66,28 +68,27 @@ class Patro_Return_NAV(Node):
             return
         
         cancel_future = self.goal_handle.cancel_goal_async()
-        cancel_future.add_done_callback(self.cancel_response_callback)
 
-    def cancel_response_callback(self, future):
-        """취소 요청 후 응답 콜백"""
-        cancel_response = future.result()
+        # 🚀 while 문으로 대기, 너무 많이 돌지 않도록 sleep 추가
+        timeout = 3  # 최대 3초 대기
+        start_time = time.time()
+
+        while not cancel_future.done():
+            if time.time() - start_time > timeout:
+                self.get_logger().error("Timeout while waiting for goal cancellation")
+                return
+            time.sleep(0.1)  # CPU 점유율 낮추기 위해 0.1초씩 대기
+
+        cancel_response = cancel_future.result()
+        
         if cancel_response.return_code == 0:
             self.get_logger().info("Goal successfully cancelled")
         else:
             self.get_logger().error(f"Failed to cancel goal, return code: {cancel_response.return_code}")
+
         self.goal_handle = None
-        
-    def execute_navigation_return(self):
-        self.RUN_FLAG = True
-        self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_return THREAD start')
-        while self.RUN_FLAG:
-            # self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_return THREAD mode check')
-            if self.MainServer.get_ROBOT_NODE_PATROL_FLAG(self.ORDER) == "2":
-                self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_return THREAD 2 mode start')
-                self.send_goal(self.targets[0][0], self.targets[0][1])
-                self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_return THREAD 2 mode end')
-            time.sleep(1)
-        self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_return THREAD end')
+
+
         
     def execute_navigation_patrol(self):
         self.RUN_FLAG = True
@@ -104,6 +105,11 @@ class Patro_Return_NAV(Node):
                     self.send_goal(x, y)
                     idx = (idx + 1) % waypoint_len  # 순환하도록 변경
                 self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD 1 mode end')
+                
+            elif self.MainServer.get_ROBOT_NODE_PATROL_FLAG(self.ORDER) == "2":
+                self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_return THREAD 2 mode start')
+                self.send_goal(self.return_target[0][0], self.return_target[0][1])
+                self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_return THREAD 2 mode end')
                 
             time.sleep(1)
         self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD end')

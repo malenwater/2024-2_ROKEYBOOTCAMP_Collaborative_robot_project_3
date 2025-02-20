@@ -5,6 +5,7 @@ import time
 from rclpy.executors import MultiThreadedExecutor
 from .Patro_Return_NAV import Patro_Return_NAV
 from .UserCommand import UserCommand
+from .GoldDetector import GoldDetector
 
 class MainServer(Node):
     """ROS2 서비스 노드 (YOLO 실행 요청을 처리)"""
@@ -16,10 +17,12 @@ class MainServer(Node):
         self.ROBOT_NAMESPACE ={}
         self.ROBOT_NODE_PATROL = {}
         self.ROBOT_NODE_PATROL_THREAD = {}
-        self.ROBOT_NODE_RETURN = {}
-        self.ROBOT_NODE_RETURN_THREAD = {}
         self.ROBOT_NODE_PATROL_FLAG = {}
+        self.GoldDetector = {}
+        self.GoldDetector_FLAG = {}
         self.ROBOT_PATROL_WAYPOINT = { "1" : [
+                                            (1.6368083953857422, -6.828545570373535),  # 공용좌표 (상단)
+                                            
                                             (1.9283926486968994, 5.010260581970215),  # 6시
                                             (6.535802364349365, 4.402944087982178),  # 7시
                                             (6.9502177238464355, -1.0246244668960571),  # 9시
@@ -54,16 +57,16 @@ class MainServer(Node):
                                                                 self.ROBOT_NAMESPACE[ORDER],
                                                                 ORDER,
                                                                 self,
-                                                                "Patrol")
+                                                                "Patrol",
+                                                                self.ROBOT_RETURN_WAYPOINT[ORDER])
+            
             self.ROBOT_NODE_PATROL_THREAD[ORDER] = threading.Thread(target=self.ROBOT_NODE_PATROL[ORDER].execute_navigation_patrol)
             self.ROBOT_NODE_PATROL_THREAD[ORDER].start()
-            self.ROBOT_NODE_RETURN[ORDER] = Patro_Return_NAV(self.ROBOT_RETURN_WAYPOINT[ORDER],
-                                                                self.ROBOT_NAMESPACE[ORDER],
-                                                                ORDER,
-                                                                self,
-                                                                "return")
-            self.ROBOT_NODE_RETURN_THREAD[ORDER] = threading.Thread(target=self.ROBOT_NODE_RETURN[ORDER].execute_navigation_return)
-            self.ROBOT_NODE_RETURN_THREAD[ORDER].start()
+            self.GoldDetector_FLAG[ORDER] = False
+            self.GoldDetector[ORDER] = GoldDetector(
+                                                        self,
+                                                        ORDER,
+                                                        self.ROBOT_NAMESPACE[ORDER],)
             
         self.get_logger().info(f'MainServer Setiing Done')
         self.get_logger().info(f'MainServer end')
@@ -73,13 +76,13 @@ class MainServer(Node):
         if command == "1" and self.ROBOT_NODE_PATROL_FLAG[robot] != "1": # 순찰
             self.get_logger().info(f'run_control start {command}')
             self.ROBOT_NODE_PATROL_FLAG[robot] = "1"
+            self.GoldDetector_FLAG[robot] = True
+            self.get_logger().info(f'run_control check {self.GoldDetector_FLAG[robot] }')
             
         elif command == "2" and self.ROBOT_NODE_PATROL_FLAG[robot] != "2": # 귀환
             self.get_logger().info(f'run_control start {command}')
-            self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
-            self.ROBOT_NODE_PATROL[robot].cancel_goal()
-            time.sleep(2)
             self.ROBOT_NODE_PATROL_FLAG[robot] = "2"
+            
         elif command == "3": # 정지
             self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
             self.ROBOT_NODE_PATROL[robot].cancel_goal()
@@ -94,13 +97,12 @@ class MainServer(Node):
             ORDER = str(idx)
             self.ROBOT_NODE_PATROL_FLAG[ORDER] = "0"  # 상태 초기화
             self.ROBOT_NODE_PATROL[ORDER].set_RUN_FLAG(False)
-            # self.ROBOT_NODE_RETURN[ORDER].set_RUN_FLAG(False)
         
         # 스레드 종료 대기
         timeout = 5  # 최대 대기 시간 (초)
         start_time = time.time()
         
-        while any(self.ROBOT_NODE_PATROL_THREAD[ORDER].is_alive() or self.ROBOT_NODE_RETURN_THREAD[ORDER].is_alive() for ORDER in self.ROBOT_ORDER):
+        while any(self.ROBOT_NODE_PATROL_THREAD[ORDER].is_alive() for ORDER in self.ROBOT_ORDER):
             if time.time() - start_time > timeout:
                 self.get_logger().warning('Timeout reached while stopping threads')
                 break
@@ -109,14 +111,17 @@ class MainServer(Node):
         for ORDER in self.ROBOT_ORDER:
             if self.ROBOT_NODE_PATROL_THREAD[ORDER].is_alive():
                 self.ROBOT_NODE_PATROL_THREAD[ORDER].join(timeout=1)
-            # if self.ROBOT_NODE_RETURN_THREAD[ORDER].is_alive():
-            #     self.ROBOT_NODE_RETURN_THREAD[ORDER].join(timeout=1)
         
         self.get_logger().info(f'stop_THREAD end')
         
     def get_ROBOT_NODE_PATROL_FLAG(self,robot):
         return self.ROBOT_NODE_PATROL_FLAG[robot] 
-   
+    def get_GoldDetector_FLAG(self,robot):
+        self.get_logger().info(f'get_GoldDetector_FLAG check {self.GoldDetector_FLAG[robot] }, {robot}')
+        return self.GoldDetector_FLAG[robot] 
+    def stop_NAV(self,robot):
+        self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
+        self.ROBOT_NODE_PATROL[robot].cancel_goal()
 def main():
     rclpy.init()
     node = MainServer()
@@ -127,7 +132,7 @@ def main():
     executor.add_node(node.ROBOT_NODE_COMMAND) 
     for ORDER in node.ROBOT_ORDER:
         executor.add_node(node.ROBOT_NODE_PATROL[ORDER])
-        # executor.add_node(node.ROBOT_NODE_RETURN[ORDER])
+        executor.add_node(node.GoldDetector[ORDER])
 
     
     try:
