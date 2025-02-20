@@ -5,8 +5,6 @@
 
 # 바운딩 박스가 일정 크기 이상이면 정지 후 /robot1/position 토픽을 통해 자신의 위치를 퍼블리시.
 
-
-
 import rclpy
 from rclpy.node import Node
 import cv2
@@ -37,21 +35,19 @@ class GoldDetector(Node):
         self.nav2_active = True
         self.current_pose = PoseStamped()
 
-    # nav2을 중단하는 함수
     def cancel_nav2(self):
-        if self.nav2_active: # nav2_active변수 통해, nav2실행중인지 체크,
+        if self.nav2_active:
             self.get_logger().info("🔴 Nav2 중단 요청!")
-            # /navigation2/cancel 서비스에, 빈요청을 보내면 
-            #  현재 실행중인 네비게이션을 중단한다. -> nav2은 빈요청을 받으면 navigation_to_pose액션을 강제종료함,
+            # nav2끊는 부분인데 안끊킴 ㅠㅠ
             req = Empty.Request()
             self.nav2_cancel_client.call_async(req)
+            # ----
             self.nav2_active = False
 
     def odom_callback(self, msg):
         self.current_pose.header = msg.header
         self.current_pose.pose = msg.pose.pose
         
-    # 로봇1에게 위치 전송 -> 로봇2는 이 위치 받고 nav2진행
     def publish_position(self):
         self.get_logger().info("📡 로봇1 위치 전송!")
         self.pose_publisher.publish(self.current_pose)
@@ -59,9 +55,9 @@ class GoldDetector(Node):
     def image_callback(self, msg):
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        lower_grey = np.array([0, 0, 50])
-        upper_grey = np.array([180, 50, 200])
-        mask = cv2.inRange(hsv, lower_grey, upper_grey)
+        lower_yellow = np.array([20, 100, 100])
+        upper_yellow = np.array([35, 255, 255])
+        mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
         largest_contour = max(contours, key=cv2.contourArea, default=None)
@@ -79,7 +75,7 @@ class GoldDetector(Node):
             else:
                 twist_msg.angular.z = 0.0
             
-            if h / self.frame_height >= 0.6:
+            if h / self.frame_height >= 0.3:
                 twist_msg.linear.x = 0.0
                 self.get_logger().info("🛑 멈춤! 로봇2에게 위치 전송")
                 self.publish_position()
@@ -87,6 +83,14 @@ class GoldDetector(Node):
                 twist_msg.linear.x = 0.1
             
             self.cmd_vel_publisher.publish(twist_msg)
+            
+            # 바운딩 박스 그리기
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.putText(frame, "Detected", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            # % 추가 
+            detection_percentage = (h / self.frame_height) * 100
+            cv2.putText(frame, f"Detected {detection_percentage:.1f}%", (x, y - 10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         
         cv2.imshow("Original", frame)
         cv2.imshow("Gold Detection", mask)
