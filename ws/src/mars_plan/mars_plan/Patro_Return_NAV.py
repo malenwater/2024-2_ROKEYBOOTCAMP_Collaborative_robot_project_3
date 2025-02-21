@@ -5,6 +5,17 @@ from nav2_msgs.action import NavigateToPose
 from geometry_msgs.msg import PoseStamped
 import time  # 시간 지연을 위해 추가
 
+'''
+#  ROS2 기반의 로봇 순찰 및 귀환 시스템을 관리하는 노드
+
+ROS2 기반의 로봇 순찰 및 귀환을 제어하는 노드.
+Nav2 액션 클라이언트를 사용하여 로봇을 특정 위치로 이동하도록 함.
+순찰 모드(1)와 귀환 모드(2)를 지원.
+
+
+
+'''
+
 class Patro_Return_NAV(Node):
     """ROS2 서비스 노드 (Patro_Return_NAV 실행 요청을 처리)"""
     def __init__(self,target, NAMESPACE, ORDER, MainServer,NAME,return_target):
@@ -14,7 +25,12 @@ class Patro_Return_NAV(Node):
         self.NAME = NAME
         self.NAMESPACE = NAMESPACE
         self.ORDER = ORDER
-        self.action_client = ActionClient(self, NavigateToPose, '/'+ NAMESPACE + '/navigate_to_pose')
+        
+        self.action_client = ActionClient(
+            self,
+            NavigateToPose,
+            '/'+ NAMESPACE + '/navigate_to_pose')
+        
         self.MainServer = MainServer
         self.targets = target
         self.goal_handle = None
@@ -126,10 +142,10 @@ def main(args=None):
                                 (6.22782564163208, 4.5692620277404785),     # 5번 맵 11시
                                 (2.4277842044830322, -1.5583202838897705),  # 7번 협곡 중앙
                                 (0.5277646780014038, -4.199518203735352)    # 9번 3시 협곡
-                            ],
-                             "/tb1",
-                             "1",
-                             None,
+                            ], # target_광물 위치
+                             "/tb1",# namespace
+                             "1", # order
+                             None, # Mainserver
                              "Patrol")
     rclpy.spin(node)
     node.destroy_node()

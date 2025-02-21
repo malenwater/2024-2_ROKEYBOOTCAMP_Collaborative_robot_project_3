@@ -63,11 +63,11 @@ class GoldDetector(Node):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         # 회색 범위 설정 (HSV 기준)
-        lower_grey = np.array([0, 0, 50])
-        upper_grey = np.array([180, 50, 200])
+        lower_yellow = np.array([20, 100, 100])
+        upper_yellow = np.array([35, 255, 255])
 
         # 색상 필터링 (마스크 생성)
-        mask = cv2.inRange(hsv, lower_grey, upper_grey)
+        mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
         # 컨투어(윤곽선) 찾기
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)

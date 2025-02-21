@@ -10,19 +10,38 @@ from .obj_ctl import ModelManager
 
 class MainServer(Node):
     """ROS2 서비스 노드 (YOLO 실행 요청을 처리)"""
+    # 로봇 초기화 
     def __init__(self):
         super().__init__('MainServer')
         self.get_logger().info(f'MainServer start')
         self.ROBOT_NUMBER = 2
         self.robot = None
         self.command = None
+        # 로봇 id 저장하는 리스트 _ 로봇 리스트 관리용
         self.ROBOT_ORDER = []
+
+        # 각 로봇의 네임스페이스 저장
+        #  self.ROBOT_NAMESPACE['1'] = "tb1"
         self.ROBOT_NAMESPACE ={}
+
+        # 각 로봇의 순찰 객체를 저장하는 딕셔너리
+        #  PATRO_Return_NAV클래스 사용하여, 로봇별 순찰을 진행시킴.
         self.ROBOT_NODE_PATROL = {}
+
+        # 각 로봇의 순찰을 수행하는 **스레드(별도 실행 흐름)**를 저장하는 딕셔너리
         self.ROBOT_NODE_PATROL_THREAD = {}
+
+        # 각 로봇의 순찰 상태를 저장하는 딕셔너리
+        #  0,정지 1,순찰중 2,귀환중 , 으로 사용 가능
         self.ROBOT_NODE_PATROL_FLAG = {}
+
+        # 각 로봇의 골드 감지를 수행하는 객체를 저장하는 딕셔너리
         self.GoldDetector = {}
+
+        #  각 로봇의 골드 감지 기능이 활성화되었는지 여부를 저장하는 딕셔너리
         self.GoldDetector_FLAG = {}
+        
+        # 순찰 waypoint
         self.ROBOT_PATROL_WAYPOINT = { "1" : [
                                             # (1.6368083953857422, -6.828545570373535),  # 공용좌표 (상단)
                                             
@@ -41,7 +60,7 @@ class MainServer(Node):
                                             (1.6368083953857422, -6.828545570373535),  # 공용좌표 (상단)
                                             (2.022683620452881, -1.4855573177337646)  # 공용좌표 (중앙)
                                         ],}
-        
+        # 귀환 waypoint
         self.ROBOT_RETURN_WAYPOINT = { "1" : [
                                             (1.5, 4.0),  # 6시
                                         ],
@@ -49,35 +68,51 @@ class MainServer(Node):
                                             (1.5, 5.0),  # 6시
                                         ],}
         
+
+        # Mainserver의 객체_self을 전달함,
+        # usercommand는 mainswerver와 연결 
+        #  -> 명령을 수신하면, 해당 명령을 Mainserver의 변수에 저장
         self.ROBOT_NODE_COMMAND = UserCommand(self)
         
         for idx in range(1,self.ROBOT_NUMBER + 1):
+            # ORDER 는 로봇1, 로봇2의 1,2를 의미함, 
             ORDER = str(idx)
             self.ROBOT_ORDER.append(ORDER)
+            # 각 로봇의 네임스페이스 설정 => tb1, tb2
             self.ROBOT_NAMESPACE[ORDER] = "tb" + ORDER
+            # 순찰 상태, 초기상태는 0으로 대기상태로 설정해놓음 
             self.ROBOT_NODE_PATROL_FLAG[ORDER] = "0"
+            # 해당 로봇의 순찰 경로,
             self.ROBOT_NODE_PATROL[ORDER] = Patro_Return_NAV(self.ROBOT_PATROL_WAYPOINT[ORDER],
                                                                 self.ROBOT_NAMESPACE[ORDER],
                                                                 ORDER,
                                                                 self,
                                                                 "Patrol",
                                                                 self.ROBOT_RETURN_WAYPOINT[ORDER])
-            
+            # 해당 로봇의 귀환 경로,
             self.ROBOT_NODE_PATROL_THREAD[ORDER] = threading.Thread(target=self.ROBOT_NODE_PATROL[ORDER].execute_navigation_patrol)
+            # 각 로봇의 순찰을 실행
             self.ROBOT_NODE_PATROL_THREAD[ORDER].start()
+            # 초기에는 골드 감지를 비활성화 
             self.GoldDetector_FLAG[ORDER] = False
+            # 각 로봇의 골드 감지 기능을 활성화 
             self.GoldDetector[ORDER] = GoldDetector(
                                                         self,
                                                         ORDER,
                                                         self.ROBOT_NAMESPACE[ORDER],)
+        # 초기 제어루프 실행 여부를 결정하는 플래그
+        #  -> true가 되면 run_control함수가 실행된다.
         self.running = False
         
         self.command_thread = threading.Thread(target=self.ROBOT_NODE_COMMAND.process_messages, daemon=True)
         self.command_thread.start()
         
+        # run_control 함수 실행을 위한 제어 스레드를 시작
+        #  run_control 은 로봇 상태를 주기적으로 체크하고 행동을 결정하는 역할을 함,
         self.worker_thread = threading.Thread(target=self.run_control, daemon=True)
         self.worker_thread.start()
         
+        # ModelManager객체를 생성하여, 모델 삭제 기능을 추가함.
         self.delete_ModelManager = ModelManager()
         
         self.get_logger().info(f'MainServer Setiing Done')
@@ -88,6 +123,8 @@ class MainServer(Node):
     def set_command(self,command):
         self.command = command
         
+    # 로봇 동작 모드 설정 
+    # 로봇 행동 관리 -> self.robot, self.command에 따라 로봇 동작이 결정된다.
     def run_control(self):
         self.get_logger().info(f'run_control start')
         self.running = True
@@ -96,19 +133,23 @@ class MainServer(Node):
             command = self.command
             # self.get_logger().info(f'run_control check')
             
+            # 1.순찰
             if command == "1" and self.ROBOT_NODE_PATROL_FLAG[robot] != "1": # 순찰
                 self.get_logger().info(f'run_control start {command} command')
                 self.ROBOT_NODE_PATROL_FLAG[robot] = "1"
+                # goal detector 활성화
                 self.GoldDetector_FLAG[robot] = True
                 self.get_logger().info(f'run_control check {self.GoldDetector_FLAG[robot] }')
-                
+
+            # 2. 귀환  
             elif command == "2" and self.ROBOT_NODE_PATROL_FLAG[robot] != "2": # 귀환
                 self.get_logger().info(f'run_control start {command} command')
                 self.ROBOT_NODE_PATROL_FLAG[robot] = "2"
-                
+            # 3. 정지   
             elif command == "3": # 정지
                 self.ROBOT_NODE_PATROL_FLAG[robot] = "0"
                 self.ROBOT_NODE_PATROL[robot].cancel_goal()
+                # goal detector 비활성화
                 self.GoldDetector_FLAG[robot] = False
                 
             elif command == "4": # 궤도 폭격
@@ -153,6 +194,8 @@ class MainServer(Node):
         
         self.get_logger().info(f'stop_THREAD end')
     
+    # collect_robot
+    # 순찰 중, 금색 감지하면, 모든 로봇을 같은 위치로 이동
     def collect_robots(self, x, y, robot):
         x = float(x)
         y = float(y)
@@ -192,7 +235,7 @@ def main():
     rclpy.init()
     node = MainServer()
     node.get_logger().info('MainServer main start')
-    
+    # 20개의 병렬 스레드를 생성
     executor = MultiThreadedExecutor(num_threads=20)
     executor.add_node(node) 
     executor.add_node(node.ROBOT_NODE_COMMAND) 

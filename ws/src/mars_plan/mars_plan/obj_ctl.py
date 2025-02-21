@@ -42,9 +42,9 @@ class ModelManager(Node):
         time.sleep(0.5)
         self.spawn_model(self.eft[0]['name'], self.eft[0]['file'], 7.0, 0.0, 0.0)  # boom 모델 생성
         time.sleep(0.5)
-        self.spawn_model(self.eft[1]['name'], self.eft[0]['file'], 7.0, 0.0, 0.0)  # boom 모델 생성
+        self.spawn_model(self.eft[1]['name'], self.eft[1]['file'], 7.0, 0.0, 0.0)  # boom 모델 생성
         time.sleep(0.5)
-        self.spawn_model(self.eft[2]['name'], self.eft[0]['file'], 7.0, 0.0, 0.0)  # boom 모델 생성
+        self.spawn_model(self.eft[2]['name'], self.eft[2]['file'], 7.0, 0.0, 0.0)  # boom 모델 생성
         time.sleep(0.5)
         # 3초 후에 gold 모델 삭제
         self.delete_model('gold')

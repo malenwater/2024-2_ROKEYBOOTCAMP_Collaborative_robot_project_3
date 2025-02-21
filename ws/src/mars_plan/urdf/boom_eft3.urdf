@@ -5,7 +5,7 @@
     <link name="light_sphere">
       <!-- 구체 시각화 -->
       <visual name="light_visual">
-        <pose>-1.5 -4.2 0 0 0 0</pose> <!-- 모델이 기존 모델과 동일한 위치에 배치되도록 설정 -->
+        <pose>0.0 0.0 0 0 0 0</pose> <!-- 모델이 기존 모델과 동일한 위치에 배치되도록 설정 -->
         <geometry>
           <sphere>
             <radius>1.2</radius>  <!-- 반지름 0.4로 설정 -->

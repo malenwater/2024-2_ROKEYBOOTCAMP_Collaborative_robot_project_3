@@ -27,13 +27,12 @@ class GoldDetector(Node):
         self.subscription = self.create_subscription(
             Image,  '/' + NAMESPACE + '/camera/image_raw', self.image_callback, 10)
         
-        # self.nav2_cancel_client = self.create_client(Empty, '/navigation2/cancel')
         self.amcl_pose_subscriber = self.create_subscription(
-            PoseWithCovarianceStamped, '/' + NAMESPACE + '/amcl_pose', self.amcl_pose_callback, 10)
+            PoseWithCovarianceStamped, '/' + NAMESPACE + '/amcl_pose',
+            self.amcl_pose_callback, 10)
         
-        
-        # self.pose_publisher = self.create_publisher(PoseStamped, '/robot1/position', 10)
-        self.cmd_vel_publisher = self.create_publisher(Twist, '/' + NAMESPACE + '/cmd_vel', 10)
+        self.cmd_vel_publisher = self.create_publisher(
+            Twist, '/' + NAMESPACE + '/cmd_vel', 10)
         
         self.bridge = CvBridge()
         self.frame_width = 640
@@ -82,8 +81,11 @@ class GoldDetector(Node):
             offset_x = center_x - screen_center_x
             twist_msg = Twist()
             
-            if abs(offset_x) > 20:
-                twist_msg.angular.z = 0.08 if offset_x < 0 else -0.08
+            # 수정 완료!
+            # offset_x가 양수면 물체가 오른쪽 → 로봇이 왼쪽(양의 angular.z)으로 회전
+            # offset_x가 음수면 물체가 왼쪽 → 로봇이 오른쪽(음의 angular.z)으로 회전
+            if abs(offset_x) > 20:  # 임계값을 넘어가면 회전
+                twist_msg.angular.z = -0.08 if offset_x > 0 else 0.08  
             else:
                 twist_msg.angular.z = 0.0
             
