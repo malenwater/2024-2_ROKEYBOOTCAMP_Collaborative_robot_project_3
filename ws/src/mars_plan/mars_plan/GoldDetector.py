@@ -101,7 +101,10 @@ class GoldDetector(Node):
             
             if h / self.frame_height >= 0.6:
                 twist_msg.linear.x = 0.0
+                twist_msg.angular.z = 0.0
                 self.get_logger().info(f"🛑 멈춤! {self.NAMESPACE}에게 위치 전송")
+                
+                self.cmd_vel_publisher.publish(twist_msg)
                 self.MainServer.collect_robots(self.x,self.y,self.ORDER)
                 self.MainServer.set_GoldDetector_FLAG(self.ORDER,False)
                 # self.publish_position()
