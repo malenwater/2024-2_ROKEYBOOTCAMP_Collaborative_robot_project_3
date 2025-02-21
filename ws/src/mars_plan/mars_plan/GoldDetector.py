@@ -95,7 +95,7 @@ class GoldDetector(Node):
             twist_msg = Twist()
             
             if abs(offset_x) > 20:
-                twist_msg.angular.z = 0.08 if offset_x < 0 else -0.2
+                twist_msg.angular.z = 0.08 if offset_x < 0 else -0.08
             else:
                 twist_msg.angular.z = 0.0
             
