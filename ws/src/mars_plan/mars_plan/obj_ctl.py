@@ -13,7 +13,12 @@ class ModelManager(Node):
         # SpawnEntity와 DeleteEntity 클라이언트 생성
         self.spawn_client = self.create_client(SpawnEntity, '/spawn_entity')
         self.delete_client = self.create_client(DeleteEntity, '/delete_entity')
-
+        
+        self.eft = [
+            {'file': os.path.join(pkg_share, 'urdf', 'boom_eft.urdf'), 'name': 'boom_eft'},
+            {'file': os.path.join(pkg_share, 'urdf', 'boom_eft2.urdf'), 'name': 'boom_eft2'},
+            {'file': os.path.join(pkg_share, 'urdf', 'boom_eft3.urdf'), 'name': 'boom_eft3'}
+        ]
         
         # 서비스가 준비될 때까지 대기
         while not self.spawn_client.wait_for_service(timeout_sec=1.0):
@@ -31,15 +36,26 @@ class ModelManager(Node):
         urdf_file_path = os.path.join(pkg_share, 'urdf', 'boom.urdf')  # SDF 파일 경로
         self.get_logger().info(f'{urdf_file_path} ')
         
+        
         # boom 모델 생성
         self.spawn_model('boom', urdf_file_path, 7.0, 0.0, 0.0)  # boom 모델 생성
-
+        time.sleep(0.5)
+        self.spawn_model(self.eft[0]['name'], self.eft[0]['file'], 7.0, 0.0, 0.0)  # boom 모델 생성
+        time.sleep(0.5)
+        self.spawn_model(self.eft[1]['name'], self.eft[0]['file'], 7.0, 0.0, 0.0)  # boom 모델 생성
+        time.sleep(0.5)
+        self.spawn_model(self.eft[2]['name'], self.eft[0]['file'], 7.0, 0.0, 0.0)  # boom 모델 생성
+        time.sleep(0.5)
         # 3초 후에 gold 모델 삭제
-        time.sleep(2)
         self.delete_model('gold')
-
+        time.sleep(0.5)
+        self.delete_model(self.eft[0]['name'])
+        time.sleep(0.5)
+        self.delete_model(self.eft[1]['name'])
+        time.sleep(0.5)
+        self.delete_model(self.eft[2]['name'])
         # 3초 후에 boom 모델 삭제
-        time.sleep(2)
+        time.sleep(0.5)
         self.delete_model('boom')
 
     def collect_minerals(self):

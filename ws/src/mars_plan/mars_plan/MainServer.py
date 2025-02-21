@@ -119,7 +119,7 @@ class MainServer(Node):
                 self.ROBOT_NODE_PATROL_FLAG[robot] = "5"
                 self.delete_ModelManager.make_GOLD()
                 
-            elif command == "6": # 광물 생성
+            elif command == "6": # 광물 회수
                 self.ROBOT_NODE_PATROL_FLAG[robot] = "6"
                 self.delete_ModelManager.collect_minerals()
             

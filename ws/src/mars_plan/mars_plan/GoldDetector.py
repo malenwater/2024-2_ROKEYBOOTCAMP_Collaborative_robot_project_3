@@ -43,15 +43,6 @@ class GoldDetector(Node):
         self.get_logger().info(f'gold_detector {NAMESPACE} end')
         self.x = None
         self.y = None
-        
-    # def cancel_nav2(self):
-    #     if self.nav2_active:
-    #         self.get_logger().info("🔴 Nav2 중단 요청!")
-    #         # nav2끊는 부분인데 안끊킴 ㅠㅠ
-    #         req = Empty.Request()
-    #         self.nav2_cancel_client.call_async(req)
-    #         # ----
-    #         self.nav2_active = False
     
     def amcl_pose_callback(self, msg):
         # x와 y 값을 PoseWithCovarianceStamped 메시지에서 가져와 self.x, self.y에 저장
@@ -60,10 +51,7 @@ class GoldDetector(Node):
     def odom_callback(self, msg):
         self.current_pose.header = msg.header
         self.current_pose.pose = msg.pose.pose
-        
-    # def publish_position(self):
-    #     self.get_logger().info("📡 로봇1 위치 전송!")
-    #     self.pose_publisher.publish(self.current_pose)
+
 
     def image_callback(self, msg):
         if self.MainServer.get_GoldDetector_FLAG(self.ORDER) == False:
@@ -121,9 +109,6 @@ class GoldDetector(Node):
             cv2.putText(frame, f"Detected {detection_percentage:.1f}%", (x, y - 10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         
-        # cv2.imshow("Original", frame)
-        # cv2.imshow("Gold Detection", mask)
-        # cv2.waitKey(1)
         self.get_logger().info(f'image_callback end')
 
 def main(args=None):
