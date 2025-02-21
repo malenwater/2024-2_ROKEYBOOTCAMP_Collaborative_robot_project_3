@@ -23,7 +23,7 @@ class ModelManager(Node):
 
     def make_GOLD(self):
         urdf_file_path = os.path.join(pkg_share, 'urdf', 'gold.sdf')  # SDF 파일 경로
-        self.spawn_model('gold', urdf_file_path, 5.0, -2.0, 0.0)  # boom 모델 생성
+        self.spawn_model('gold', urdf_file_path, 7.0, 0.0, 0.0)  # boom 모델 생성
 
 
     def delete_GOLD(self):
@@ -32,7 +32,7 @@ class ModelManager(Node):
         self.get_logger().info(f'{urdf_file_path} ')
         
         # boom 모델 생성
-        self.spawn_model('boom', urdf_file_path, 5.0, -2.0, 0.0)  # boom 모델 생성
+        self.spawn_model('boom', urdf_file_path, 7.0, 0.0, 0.0)  # boom 모델 생성
 
         # 3초 후에 gold 모델 삭제
         time.sleep(2)
@@ -41,6 +41,22 @@ class ModelManager(Node):
         # 3초 후에 boom 모델 삭제
         time.sleep(2)
         self.delete_model('boom')
+
+    def collect_minerals(self):
+        
+        urdf_file_path = os.path.join(pkg_share, 'urdf', 'blue.urdf')  # SDF 파일 경로
+        self.get_logger().info(f'{urdf_file_path} ')
+        
+        # boom 모델 생성
+        self.spawn_model('blue', urdf_file_path, 7.0, 0.0, 0.0)  # boom 모델 생성
+
+        # 3초 후에 gold 모델 삭제
+        time.sleep(2)
+        self.delete_model('gold')
+
+        # 3초 후에 boom 모델 삭제
+        time.sleep(2)
+        self.delete_model('blue')
         
     def spawn_model(self, model_name, urdf_file_path, x, y, z):
         model_pose = Pose()

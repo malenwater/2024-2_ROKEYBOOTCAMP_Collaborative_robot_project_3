@@ -118,6 +118,11 @@ class MainServer(Node):
             elif command == "5": # 광물 생성
                 self.ROBOT_NODE_PATROL_FLAG[robot] = "5"
                 self.delete_ModelManager.make_GOLD()
+                
+            elif command == "6": # 광물 생성
+                self.ROBOT_NODE_PATROL_FLAG[robot] = "6"
+                self.delete_ModelManager.make_GOLD()
+            
             self.robot =None
             self.command = None
             time.sleep(0.5)
@@ -161,11 +166,11 @@ class MainServer(Node):
             self.get_logger().info(f'collect_robots {item} runnig')
             self.ROBOT_NODE_PATROL[item].send_goal(x,y)
         
-        self.delete_ModelManager.delete_GOLD()
-        self.get_logger().info(f'delete_GOLD')
+        # self.delete_ModelManager.delete_GOLD()
+        # self.get_logger().info(f'delete_GOLD')
         
-        for item in self.ROBOT_ORDER:
-            self.ROBOT_NODE_PATROL_FLAG[item] = "2"
+        # for item in self.ROBOT_ORDER:
+        #     self.ROBOT_NODE_PATROL_FLAG[item] = "2"
         self.get_logger().info(f'collect_robots {x}, {y}, {robot} end')
         
     def get_ROBOT_NODE_PATROL_FLAG(self,robot):

@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel, QHBoxLayout
 from PyQt5.QtGui import QPixmap, QImage
 from .UI_Node import ROS2Thread
+import cv2
 class RobotControlUI(QWidget):
     def __init__(self):
         super().__init__()
@@ -27,7 +28,7 @@ class RobotControlUI(QWidget):
         btn_layout = QHBoxLayout()
         buttons = [("순찰", self.run_patrol), ("정지", self.stop_robot),
                    ("복귀", self.return_to_base), ("궤도 포격", self.run_orbital_strike),
-                   ("광물 생성", self.generate_minerals)]
+                   ("광물 회수", self.collect_minerals),("광물 생성", self.generate_minerals)]
         
         for text, method in buttons:
             btn = QPushButton(text, self)
@@ -44,11 +45,13 @@ class RobotControlUI(QWidget):
         self.set_label_image(self.label_img2, img)
 
     def set_label_image(self, label, img):
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # BGR을 RGB로 변환
         height, width, channel = img.shape
         bytes_per_line = 3 * width
         qimg = QImage(img.data, width, height, bytes_per_line, QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(qimg)
         label.setPixmap(pixmap)
+
 
     def run_patrol(self):
         self.ros_thread.node.publish_Command("1", "1")
@@ -64,7 +67,10 @@ class RobotControlUI(QWidget):
 
     def run_orbital_strike(self):
         self.ros_thread.node.publish_Command("0", "4")
-
+        
+    def collect_minerals(self):
+        self.ros_thread.node.publish_Command("0", "6")
+        
     def generate_minerals(self):
         self.ros_thread.node.publish_Command("0", "5")
 
