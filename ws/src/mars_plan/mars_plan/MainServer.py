@@ -17,6 +17,7 @@ class MainServer(Node):
         self.robot = None
         self.command = None
         # 로봇 id 저장하는 리스트 _ 로봇 리스트 관리용
+        # '1', '2'
         self.ROBOT_ORDER = []
 
         # 각 로봇의 네임스페이스 저장
@@ -75,11 +76,12 @@ class MainServer(Node):
         
         for idx in range(1,self.ROBOT_NUMBER + 1):
             # ORDER 는 로봇1, 로봇2의 1,2를 의미함, 
-            ORDER = str(idx)
+            ORDER = str(idx) #'1', '2'
             self.ROBOT_ORDER.append(ORDER)
             # 각 로봇의 네임스페이스 설정 => tb1, tb2
             self.ROBOT_NAMESPACE[ORDER] = "tb" + ORDER
             # 순찰 상태, 초기상태는 0으로 대기상태로 설정해놓음 
+            # 딕셔너리 형태로, 키값에는 로봇번호 / 벨류에는 명령어플래그 번호가 들어간다./ 초기에는 0으로 설정.
             self.ROBOT_NODE_PATROL_FLAG[ORDER] = "0"
             # 해당 로봇의 순찰 경로,
             self.ROBOT_NODE_PATROL[ORDER] = Patro_Return_NAV(self.ROBOT_PATROL_WAYPOINT[ORDER],

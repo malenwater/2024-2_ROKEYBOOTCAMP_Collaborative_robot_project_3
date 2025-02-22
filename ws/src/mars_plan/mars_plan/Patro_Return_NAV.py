@@ -14,6 +14,15 @@ Nav2 액션 클라이언트를 사용하여 로봇을 특정 위치로 이동하
 
 
 
+
+# 해당 로봇의 순찰 경로,
+            self.ROBOT_NODE_PATROL[ORDER] = Patro_Return_NAV(self.ROBOT_PATROL_WAYPOINT[ORDER],  => waypoint들이 target
+                                                                self.ROBOT_NAMESPACE[ORDER],     => Namespace
+                                                                ORDER,
+                                                                self,                            => mainserver
+                                                                "Patrol",                        => Name
+                                                                self.ROBOT_RETURN_WAYPOINT[ORDER] => return_target
+                                                                )
 '''
 
 class Patro_Return_NAV(Node):
@@ -111,6 +120,8 @@ class Patro_Return_NAV(Node):
         self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD start')
         while self.RUN_FLAG:
             self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD mode check')
+            # order부분에는 로봇번호_ 예를들어 1,2가 들어간다
+            # 1. 순찰 
             if self.MainServer.get_ROBOT_NODE_PATROL_FLAG(self.ORDER) == "1":
                 self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD 1 mode start')
                 idx = 0
@@ -122,6 +133,7 @@ class Patro_Return_NAV(Node):
                     idx = (idx + 1) % waypoint_len  # 순환하도록 변경
                 self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_patrol THREAD 1 mode end')
                 
+            # 2. 귀환
             elif self.MainServer.get_ROBOT_NODE_PATROL_FLAG(self.ORDER) == "2":
                 self.get_logger().info(f'{self.NAME} {self.NAMESPACE} execute_navigation_return THREAD 2 mode start')
                 self.send_goal(self.return_target[0][0], self.return_target[0][1])

@@ -3,6 +3,16 @@ from gazebo_msgs.srv import SpawnEntity, DeleteEntity
 from geometry_msgs.msg import Pose
 from rclpy.node import Node
 import time
+'''
+ament_index_python.packages
+ament_index_python,은 ros2패키지 관리 시스템(ament) 에서 제공하는 파이썬 라이브러리
+ament_index_python.packages 모듈은 ROS 2 패키지 관련 정보(예: 경로)를 찾을 때 사용됩
+
+
+get_package_share_directory(ros2패키지 이름)
+=> ros2패키지 이름,을 전달하면 해당 경로를 찾아 반환한다.
+
+'''
 from ament_index_python.packages import get_package_share_directory
 pkg_share = get_package_share_directory('mars_plan')
 import os
