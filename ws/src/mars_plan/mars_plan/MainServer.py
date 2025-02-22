@@ -9,8 +9,7 @@ from .GoldDetector import GoldDetector
 from .obj_ctl import ModelManager
 
 class MainServer(Node):
-    """ROS2 서비스 노드 (YOLO 실행 요청을 처리)"""
-    # 로봇 초기화 
+    """MainServer 노드 """
     def __init__(self):
         super().__init__('MainServer')
         self.get_logger().info(f'MainServer start')

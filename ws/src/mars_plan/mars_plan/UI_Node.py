@@ -28,7 +28,9 @@ class GoldDetector(Node):
         self.bridge = CvBridge()
         self.subscription = self.create_subscription(
             Image, '/' + NAMESPACE + '/camera/image_raw', self.image_callback, 10)
-
+        self.frame_width = 640
+        self.frame_height = 480
+        
     def image_callback(self, msg):
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -41,9 +43,11 @@ class GoldDetector(Node):
         if largest_contour is not None:
             x, y, w, h = cv2.boundingRect(largest_contour)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # OpenCV의 BGR을 PyQt의 RGB로 변환
-        self.image_signal.emit(rgb_frame)  # UI 업데이트를 위한 신호 전달
+            detection_percentage = (h / self.frame_height) * 100
+            cv2.putText(frame, f"Detected {detection_percentage:.1f}%", (x, y - 10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            
+        self.image_signal.emit(frame)  # UI 업데이트를 위한 신호 전달
 
 
 class ROS2Thread(QThread):
