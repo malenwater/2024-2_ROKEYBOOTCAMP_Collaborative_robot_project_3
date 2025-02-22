@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="custom_world">
+    <!-- 기존 환경 조명 추가 -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+
+    <!-- Gazebo 기본 평면 추가 -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- 커스텀 맵 로드 -->
+    <model name="custom_map">
+      <static>true</static>
+      <pose>0 0 0 0 0 0</pose>
+      <include>
+        <uri>model://mars_map</uri>
+      </include>
+    </model>
+
+
+  </world>
+</sdf>

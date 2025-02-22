@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="red_light_sphere">
+    <static>true</static>
+    <link name="light_sphere">
+      <!-- 구체 시각화 -->
+      <visual name="light_visual">
+        <pose>0.0 0.0 0 0 0 0</pose> <!-- 모델이 기존 모델과 동일한 위치에 배치되도록 설정 -->
+        <geometry>
+          <sphere>
+            <radius>0.8</radius>  <!-- 반지름 0.4로 설정 -->
+          </sphere>
+        </geometry>
+        <material>
+          <ambient>1 0 0 1</ambient>  <!-- 빨간색 -->
+          <diffuse>1 0 0 0.5</diffuse>  <!-- 반투명한 빨간색 -->
+          <specular>0 0 0 0</specular>
+          <emissive>0 0 0 1</emissive> <!-- 빛나는 효과 추가 -->
+          <transparency>0.5</transparency> <!-- 0.0은 불투명, 1.0은 완전 투명, 여기서는 반투명 설정 -->
+        </material>
+      </visual>
+      
+      <!-- 충돌체 비활성화 (모델에 충돌체를 추가하지 않음) -->
+      <!-- 구체 모델은 물리적인 충돌이 발생하지 않도록 설정 -->
+    </link>
+  </model>
+</sdf>

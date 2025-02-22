@@ -1,0 +1,1 @@
+ros2 service call /tb2/bt_navigator/get_state  lifecycle_msgs/srv/GetState "{}"
