@@ -1,1 +1,0 @@
-ros2 launch turtlebot3_multi_robot gazebo_multi_nav2_world.launch.py

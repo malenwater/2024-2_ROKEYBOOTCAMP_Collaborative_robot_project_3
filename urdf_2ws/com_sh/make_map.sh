@@ -1,1 +1,0 @@
-ros2 launch  sim_tutorial lidar.launch.py
