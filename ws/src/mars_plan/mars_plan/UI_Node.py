@@ -26,8 +26,11 @@ class GoldDetector(Node):
     def __init__(self, NAMESPACE="tb1"):
         super().__init__('gold_detector_IMG_' + NAMESPACE)
         self.bridge = CvBridge()
+        
         self.subscription = self.create_subscription(
-            Image, '/' + NAMESPACE + '/camera/image_raw', self.image_callback, 10)
+            Image, '/' + NAMESPACE + '/camera/image_raw',
+            self.image_callback,
+            10)
         self.frame_width = 640
         self.frame_height = 480
         

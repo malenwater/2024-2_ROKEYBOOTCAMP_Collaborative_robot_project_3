@@ -60,7 +60,7 @@ def generate_launch_description():
 
     world = os.path.join(
         get_package_share_directory('mars_plan'),
-        'worlds', 'custom_world.world')
+        'worlds', 'parking_world.world')
 
     gzserver_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(

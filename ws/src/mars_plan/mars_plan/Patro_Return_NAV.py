@@ -147,6 +147,7 @@ class Patro_Return_NAV(Node):
         self.RUN_FLAG = DATA
         
 def main(args=None):
+    # 실험 코드, 
     rclpy.init(args=args)
     node = Patro_Return_NAV([
                                 (-6.142860412597656, -1.1557469367980957),  # 1번 맵 6시
