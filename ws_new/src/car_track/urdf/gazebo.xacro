@@ -15,13 +15,14 @@
             <max_wheel_acceleration>10.0</max_wheel_acceleration>
 
             <!-- Output -->
-            <odometry_frame>odom</odometry_frame>
-            <robot_base_frame>base_link</robot_base_frame>
 
             <publish_odom>true</publish_odom>
             <publish_odom_tf>true</publish_odom_tf>
-            <publish_wheel_tf>true</publish_wheel_tf>
+            <publish_wheel_tf>false</publish_wheel_tf>
 
+            <odometry_topic>odom</odometry_topic>
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>base_footprint</robot_base_frame>
         </plugin>
     </gazebo>
 
@@ -52,7 +53,6 @@
             </plugin>
         </sensor>
     </gazebo>
-
 
 
 </robot>
