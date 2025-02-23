@@ -1,1 +1,0 @@
-ros2 launch gazebo_ros gazebo.launch.py
