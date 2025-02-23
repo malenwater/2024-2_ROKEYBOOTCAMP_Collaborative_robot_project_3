@@ -165,6 +165,32 @@
         </collision>
     </link>
 
+    <!-- IMU LINK 추가 -->
+    <joint name="imu_joint" type="fixed">
+        <parent link="base_link"/>  <!-- IMU는 로봇 본체에 부착 -->
+        <child link="imu_link"/>
+        <origin xyz="0.05 0 0.1" rpy="0 0 0"/> <!-- IMU 위치 조정 -->
+    </joint>
+
+    <link name="imu_link">
+        <visual>
+            <geometry>
+                <box size="0.02 0.02 0.02"/>  <!-- IMU 크기 -->
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="0.02 0.02 0.02"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.05"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertia ixx="1.0e-5" iyy="1.0e-5" izz="1.0e-5"/>
+        </inertial>
+    </link>
+    
     <!-- GAZEBO -->
     <xacro:include filename="gazebo.xacro"/>
     <xacro:include filename="lidar.xacro"/>

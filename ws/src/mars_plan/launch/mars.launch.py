@@ -58,9 +58,14 @@ def generate_launch_description():
         mars_plan, 'urdf', 'turtlebot3_' + TURTLEBOT3_MODEL + '.urdf'
     )
 
-    world = os.path.join(
+    # world = os.path.join(
+    #     get_package_share_directory('mars_plan'),
+    #     'worlds', 'parking_world.world')
+    
+    wolrd = os.path.join(
         get_package_share_directory('mars_plan'),
-        'worlds', 'parking_world.world')
+        'worlds', 'custom_world.world'
+    )
 
     gzserver_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -126,7 +131,7 @@ def generate_launch_description():
 
         # Create state publisher node for that instance
         turtlebot_state_publisher = Node(
-            package='robot_state_publisher',
+            pacakage='robot_state_publisher',
             namespace=namespace,
             executable='robot_state_publisher',
             output='screen',

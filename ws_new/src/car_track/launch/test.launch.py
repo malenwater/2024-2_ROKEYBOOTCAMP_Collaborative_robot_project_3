@@ -73,8 +73,9 @@ def generate_launch_description():
         package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=["-topic", "robot_description", "-entity", "with_robot",
-                    '-x', "1.0", '-y',  "1.0",
-                     '-z', "10.0" , '-Y', '0.0',
+                    '-x', "3.5", '-y',  "0.5",
+                     '-z', "100.0" ,  # (x,y,z) == 생성 위치
+                     '-Y', '-1.57', # 3.14 라디안 == 180도,
                    ],
         output="screen",
     )
