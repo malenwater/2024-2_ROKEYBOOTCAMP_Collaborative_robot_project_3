@@ -5,10 +5,7 @@
     <include>
       <uri>model://sun</uri>
     </include>
-    <include>
-    	<uri>model://turtlebot3_waffle_pi</uri>
-    	<pose>2.0 2.0 0.2 0 0 0</pose>
-    </include>
+
 
     <!-- Gazebo 기본 평면 추가 -->
     <include>
@@ -24,10 +21,6 @@
       </include>
     </model>
 
-    <!-- TurtleBot3 로봇 추가 -->
-    <include>
-      <uri>model://turtlebot3_waffle_pi</uri>
-    </include>
+
   </world>
 </sdf>
-

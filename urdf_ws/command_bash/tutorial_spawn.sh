@@ -1,1 +1,0 @@
-ros2 run gazebo_ros spawn_entity.py -topic robot_description -entity with_robot -x 0 -y 0 -z 1.0
